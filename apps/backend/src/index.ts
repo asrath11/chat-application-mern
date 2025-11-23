@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { connectDB } from './lib/db';
+import authRoute from './routes/auth.route';
 
 const app = express();
 
@@ -24,6 +25,8 @@ app.use(morgan('dev'));
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+app.use('/api/auth', authRoute);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
