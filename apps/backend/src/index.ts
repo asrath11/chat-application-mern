@@ -5,8 +5,11 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { connectDB } from './lib/db';
 
 const app = express();
+
+connectDB();
 
 app.use(express.json());
 app.use(
