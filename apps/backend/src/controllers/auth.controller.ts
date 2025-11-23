@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { asyncHandler } from '../utils/asyncHandler';
-import User from '../models/user.model';
+import { asyncHandler } from '@/utils/asyncHandler';
+import User from '@/models/user.model';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
