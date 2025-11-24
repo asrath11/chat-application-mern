@@ -46,7 +46,8 @@ export default function SignUp() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await register(values);
+      const { confirmPassword, ...rest } = values;
+      await register(rest);
       toast.success('Account created successfully');
       navigate('/');
     } catch (error: any) {

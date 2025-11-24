@@ -36,7 +36,16 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   generateCookie(res, accessToken, 'accessToken');
   generateCookie(res, refreshToken, 'refreshToken');
 
-  return res.status(201).json({ user });
+  return res.status(201).json({
+    user: {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+  });
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
@@ -69,7 +78,16 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   generateCookie(res, accessToken, 'accessToken');
   generateCookie(res, refreshToken, 'refreshToken');
 
-  return res.status(200).json({ user });
+  return res.status(200).json({
+    user: {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+  });
 });
 
 export const refreshAccessToken = asyncHandler(
@@ -87,7 +105,7 @@ export const refreshAccessToken = asyncHandler(
       return res.status(403).json({ message: 'Invalid refresh token' });
     }
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select('+refreshToken');
 
     if (!user || user.refreshToken !== refreshToken) {
       return res
@@ -121,7 +139,16 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  return res.status(200).json({ user });
+  return res.status(200).json({
+    user: {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+  });
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
