@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/context/AuthContext'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -31,6 +32,8 @@ import { loginFormSchema } from '@/lib/validation-schemas'
 const formSchema = loginFormSchema
 
 export default function SignIn() {
+    const { login } = useAuth();
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false)
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -43,10 +46,12 @@ export default function SignIn() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true)
         try {
-            console.log(values)
-        } catch (error) {
-            console.error('Form submission error', error)
-            toast.error('Failed to submit the form. Please try again.')
+            await login(values);
+            toast.success('Logged in successfully');
+            navigate('/');
+        } catch (error: any) {
+            console.error('Login error', error)
+            toast.error(error?.response?.data?.message || 'Failed to login')
         } finally {
             setIsLoading(false)
         }

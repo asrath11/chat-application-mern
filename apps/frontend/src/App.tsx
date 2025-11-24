@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import SignIn from './pages/auth/SignIn';
 import SignUp from './pages/auth/SignUp';
 import NotFound from './pages/NotFound';
-import { ThemeProvider } from 'next-themes';
+import { Providers } from '@/providers/Providers';
 import './App.css';
 
 function Home() {
@@ -16,16 +16,14 @@ function Home() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme='system' attribute='class' enableSystem={true}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <Providers>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Providers>
   );
 }
 

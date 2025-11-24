@@ -114,6 +114,16 @@ export const refreshAccessToken = asyncHandler(
   }
 );
 
+export const getMe = asyncHandler(async (req: Request, res: Response) => {
+  const user = await User.findById(req.user?.id);
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  return res.status(200).json({ user });
+});
+
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken;
 
