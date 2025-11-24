@@ -35,11 +35,7 @@ export const createChat = asyncHandler(async (req: Request, res: Response) => {
 
 export const allChats = asyncHandler(async (req: Request, res: Response) => {
   const chats = await Chat.find({ participants: req.user?.id })
-    .populate({
-      path: 'participants',
-      select: '-password',
-      match: { _id: { $ne: req.user?.id } },
-    })
+    .populate('participants', '-password')
     .populate('latestMessage')
     .sort({ updatedAt: -1 });
 
