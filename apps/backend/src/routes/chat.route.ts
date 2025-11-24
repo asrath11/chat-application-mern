@@ -1,9 +1,9 @@
 import express from 'express';
-import { createChat } from '../controllers/chat.controller';
+import { allChats, createChat } from '../controllers/chat.controller';
 import { protect } from '@/middlewares/protect';
 
 const router = express.Router();
 
-router.post('/', protect, createChat);
+router.route('/').post(protect, createChat).get(protect, allChats);
 
 export default router;

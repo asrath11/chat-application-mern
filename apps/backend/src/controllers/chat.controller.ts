@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '@/utils/asyncHandler';
-import Chat from '@/models/chat.model';
+import Chat, { IChat } from '@/models/chat.model';
+import { IUser } from '@/models/user.model';
+import { IMessage } from '@/models/message.model';
+
+interface PopulatedChat extends Omit<IChat, 'participants' | 'latestMessage'> {
+  participants: IUser[];
+  latestMessage?: IMessage;
+}
 
 export const createChat = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.body;
@@ -24,4 +31,37 @@ export const createChat = asyncHandler(async (req: Request, res: Response) => {
     .sort({ updatedAt: -1 });
 
   res.status(201).json(fullChat);
+});
+
+export const allChats = asyncHandler(async (req: Request, res: Response) => {
+  const chats = await Chat.find({ participants: req.user?.id })
+    .populate({
+      path: 'participants',
+      select: '-password',
+      match: { _id: { $ne: req.user?.id } },
+    })
+    .populate('latestMessage')
+    .sort({ updatedAt: -1 });
+
+  const formattedChats = (chats as unknown as PopulatedChat[])
+    .map((chat) => {
+      const user = chat.participants.find(
+        (p) => p._id.toString() !== req.user?.id
+      );
+
+      if (!user) return null;
+
+      return {
+        id: chat._id,
+        name: user.name,
+        avatar: user.avatar || '',
+        lastMessage: chat.latestMessage,
+        timestamp: chat.updatedAt,
+        unread: 2, //this is for testing purpose
+        isOnline: false,
+      };
+    })
+    .filter(Boolean);
+
+  res.status(200).json(formattedChats);
 });

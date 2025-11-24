@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/context/AuthContext';
@@ -7,14 +8,21 @@ import { Toaster } from 'sonner';
 export const Providers: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const [queryClient] = useState(() => new QueryClient());
   return (
-    <AuthProvider>
-      <ThemeProvider defaultTheme='system' attribute='class' enableSystem={true}>
-        <BrowserRouter>
-          <Toaster richColors position='top-right' />
-          {children}
-        </BrowserRouter>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider
+          defaultTheme='system'
+          attribute='class'
+          enableSystem={true}
+        >
+          <BrowserRouter>
+            <Toaster richColors position='top-right' />
+            {children}
+          </BrowserRouter>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
