@@ -14,45 +14,6 @@ interface ChatWindowProps {
   chatId: string;
 }
 
-// Mock data - replace with real data later
-const mockMessages = [
-  {
-    id: '1',
-    sender: 'other',
-    content: 'Hey! How are you doing?',
-    timestamp: '10:30 AM',
-    status: 'read',
-  },
-  {
-    id: '2',
-    sender: 'me',
-    content: "I'm doing great! Just working on the chat app.",
-    timestamp: '10:32 AM',
-    status: 'read',
-  },
-  {
-    id: '3',
-    sender: 'other',
-    content: 'That sounds awesome! How is it going?',
-    timestamp: '10:33 AM',
-    status: 'read',
-  },
-  {
-    id: '4',
-    sender: 'me',
-    content: 'Pretty well! Building the UI right now. Check out this design!',
-    timestamp: '10:35 AM',
-    status: 'delivered',
-  },
-  {
-    id: '5',
-    sender: 'other',
-    content: 'Wow, looks amazing! 🎉',
-    timestamp: '10:36 AM',
-    status: 'sent',
-  },
-];
-
 const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const [message, setMessage] = useState('');
   const [isTyping] = useState(false);
@@ -137,20 +98,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
               className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                  msg.sender === 'me'
+                className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.sender === 'me'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground'
-                }`}
+                  }`}
               >
                 <p className='text-sm wrap-break-word'>{msg.content}</p>
                 <div className='flex items-center justify-end gap-1 mt-1'>
                   <span
-                    className={`text-xs ${
-                      msg.sender === 'me'
+                    className={`text-xs ${msg.sender === 'me'
                         ? 'text-muted-foreground'
                         : 'text-primary'
-                    }`}
+                      }`}
                   >
                     {msg.timestamp}
                   </span>
