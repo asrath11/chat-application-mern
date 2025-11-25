@@ -1,13 +1,8 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '@/utils/asyncHandler';
-import Chat, { IChat } from '@/models/chat.model';
+import Chat from '@/models/chat.model';
 import { IUser } from '@/models/user.model';
 import { IMessage } from '@/models/message.model';
-
-interface PopulatedChat extends Omit<IChat, 'participants' | 'latestMessage'> {
-  participants: IUser[];
-  latestMessage?: IMessage;
-}
 
 export const createChat = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.body;
@@ -26,20 +21,21 @@ export const createChat = asyncHandler(async (req: Request, res: Response) => {
     participants: [req.user?.id, userId],
   });
 
-  const fullChat = await Chat.findById(newChat._id)
-    .populate('participants', '-password')
-    .sort({ updatedAt: -1 });
+  const fullChat = await Chat.findById(newChat._id).populate(
+    'participants',
+    '-password'
+  );
 
   res.status(201).json(fullChat);
 });
 
 export const allChats = asyncHandler(async (req: Request, res: Response) => {
   const chats = await Chat.find({ participants: req.user?.id })
-    .populate('participants', '-password')
-    .populate('latestMessage')
+    .populate<{ participants: IUser[] }>('participants', '-password')
+    .populate<{ latestMessage: IMessage }>('latestMessage')
     .sort({ updatedAt: -1 });
 
-  const formattedChats = (chats as unknown as PopulatedChat[])
+  const formattedChats = chats
     .map((chat) => {
       const user = chat.participants.find(
         (p) => p._id.toString() !== req.user?.id
@@ -51,13 +47,37 @@ export const allChats = asyncHandler(async (req: Request, res: Response) => {
         id: chat._id,
         name: user.name,
         avatar: user.avatar || '',
-        lastMessage: chat.latestMessage,
-        timestamp: chat.updatedAt,
-        unread: 2, //this is for testing purpose
-        isOnline: false,
+        lastMessage: chat.latestMessage?.content || '',
+        timestamp: chat.updatedAt.toISOString(),
+        unread: 2,
+        isOnline: user.isOnline,
+        lastSeen: user.lastSeen,
       };
     })
     .filter(Boolean);
 
   res.status(200).json(formattedChats);
+});
+
+export const getChatById = asyncHandler(async (req: Request, res: Response) => {
+  const chat = await Chat.findById(req.params.id)
+    .populate<{ participants: IUser[] }>('participants', '-password')
+    .populate('latestMessage');
+
+  if (!chat) return res.status(404).json({ message: 'Chat not found' });
+
+  const user = chat.participants.find((p) => p._id.toString() !== req.user?.id);
+
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  const formattedChat = {
+    id: chat._id,
+    name: user.name,
+    avatar: user.avatar || '',
+    timestamp: chat.updatedAt.toISOString(),
+    isOnline: user.isOnline,
+    lastSeen: user.lastSeen,
+  };
+
+  res.status(200).json(formattedChat);
 });

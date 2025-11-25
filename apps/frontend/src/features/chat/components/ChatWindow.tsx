@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Smile, Paperclip, MoreVertical, Phone, Video } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useQuery } from '@tanstack/react-query';
+import { getChatById } from '@/services/chat.service';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatWindowProps {
   chatId: string;
@@ -45,17 +48,15 @@ const mockMessages = [
   },
 ];
 
-const mockContact = {
-  name: 'John Doe',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-  isOnline: true,
-  lastSeen: 'online',
-};
-
-const ChatWindow: React.FC<ChatWindowProps> = () => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const [message, setMessage] = useState('');
   const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { data: chat } = useQuery({
+    queryKey: ['chat', chatId],
+    queryFn: () => getChatById(chatId),
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,20 +81,19 @@ const ChatWindow: React.FC<ChatWindowProps> = () => {
       <div className='flex items-center justify-between p-4 bg-card border-b'>
         <div className='flex items-center gap-3'>
           <div className='relative'>
-            <img
-              src={mockContact.avatar}
-              alt={mockContact.name}
-              className='w-10 h-10 rounded-full'
-            />
-            {mockContact.isOnline && (
+            <Avatar>
+              <AvatarImage src={chat?.avatar} />
+              <AvatarFallback>{chat?.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            {chat?.isOnline && (
               <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 rounded-full'></div>
             )}
           </div>
           <div>
             <h2 className='font-semibold text-gray-900 dark:text-white'>
-              {mockContact.name}
+              {chat?.name}
             </h2>
-            <p className='text-xs'>{mockContact.lastSeen}</p>
+            <p className='text-xs'>{chat?.lastSeen}</p>
           </div>
         </div>
 

@@ -8,6 +8,8 @@ export interface IUser extends Document {
   password: string;
   avatar?: string;
   refreshToken?: string;
+  isOnline: boolean;
+  lastSeen: Date;
   comparePassword(enteredPassword: string): Promise<boolean>;
   createdAt: Date;
   updatedAt: Date;
@@ -38,6 +40,14 @@ const userSchema = new mongoose.Schema<IUser>(
     refreshToken: {
       type: String,
       select: false,
+    },
+    isOnline: {
+      type: Boolean,
+      default: false,
+    },
+    lastSeen: {
+      type: Date,
+      default: Date.now,
     },
   },
   {

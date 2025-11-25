@@ -1,33 +1,32 @@
 import axiosInstance from '@/lib/axios';
 
-export interface ChatResponse {
+export interface BaseChat {
   id: string;
   name: string;
   avatar?: string;
   isOnline?: boolean;
+  lastSeen: string;
+}
+
+export interface ChatResponse extends BaseChat {
   unread?: number;
   lastMessage?: string;
   timestamp: string;
 }
 
+export type GetChatByIdResponse = BaseChat;
+
 export const createChat = async (userId: string): Promise<ChatResponse> => {
-  try {
-    const response = await axiosInstance.post<ChatResponse>('/chat', {
-      userId,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error creating chat:', error);
-    throw error;
-  }
+  const response = await axiosInstance.post<ChatResponse>('/chat', { userId });
+  return response.data;
 };
 
 export const allChats = async (): Promise<ChatResponse[]> => {
-  try {
-    const response = await axiosInstance.get<ChatResponse[]>('/chat');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching chats:', error);
-    throw error;
-  }
+  const response = await axiosInstance.get<ChatResponse[]>('/chat');
+  return response.data;
+};
+
+export const getChatById = async (id: string): Promise<GetChatByIdResponse> => {
+  const response = await axiosInstance.get<GetChatByIdResponse>(`/chat/${id}`);
+  return response.data;
 };

@@ -4,6 +4,7 @@ import { Search, MessageSquarePlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/input';
 import { allChats } from '@/services/chat.service';
+import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatListProps {
@@ -12,6 +13,7 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const {
     data: chats,
@@ -64,7 +66,8 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
               key={chat.id}
               className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-b ${
                 activeChatId === chat.id ? 'bg-muted' : ''
-              }`}
+                }`}
+              onClick={() => navigate(`/chat/${chat.id}`)}
             >
               {/* Avatar */}
               <div className='relative shrink-0'>
