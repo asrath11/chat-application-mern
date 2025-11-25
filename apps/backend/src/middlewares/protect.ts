@@ -10,10 +10,6 @@ export const protect = asyncHandler(
       (req.headers.authorization?.startsWith('Bearer ') &&
         req.headers.authorization?.split(' ')[1]);
 
-    console.log('Headers:', req.headers);
-    console.log('Cookies:', req.cookies);
-    console.log('AccessToken:', accessToken);
-
     if (!accessToken) {
       return res.status(401).json({ message: 'Access token missing' });
     }

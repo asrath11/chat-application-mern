@@ -10,6 +10,7 @@ import { connectDB } from './lib/db';
 import authRoute from './routes/auth.route';
 import chatRoute from './routes/chat.route';
 import userRoute from './routes/user.route';
+import messageRoute from './routes/message.route';
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoute);
 app.use('/api/chat', chatRoute);
 app.use('/api/user', userRoute);
+app.use('/api/message', messageRoute);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>

@@ -4,6 +4,11 @@ import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { getChatById } from '@/services/chat.service';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  getAllMessages,
+  sendMessage,
+  type Message,
+} from '@/services/message.service';
 
 interface ChatWindowProps {
   chatId: string;
@@ -58,6 +63,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     queryFn: () => getChatById(chatId),
   });
 
+  const { data: messages } = useQuery({
+    queryKey: ['messages', chatId],
+    queryFn: () => getAllMessages(chatId),
+  });
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -66,9 +76,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     scrollToBottom();
   }, []);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    await sendMessage({
+      content: message,
+      chat: chatId,
+      status: 'sent',
+      timestamp: new Date().toISOString(),
+    });
 
     // TODO: Send message via socket
     console.log('Sending message:', message);
@@ -112,40 +128,46 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
 
       {/* Messages Area */}
       <div className='flex-1 overflow-y-auto p-4 space-y-4'>
-        {mockMessages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-          >
+        {messages && messages.length === 0 ? (
+          <p className='text-center text-gray-500'>No messages yet</p>
+        ) : (
+          messages?.map((msg: Message) => (
             <div
-              className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                msg.sender === 'me'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-secondary-foreground'
-              }`}
+              key={msg._id}
+              className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
             >
-              <p className='text-sm wrap-break-word'>{msg.content}</p>
-              <div className='flex items-center justify-end gap-1 mt-1'>
-                <span
-                  className={`text-xs ${
-                    msg.sender === 'me' ? 'text-muted-foreground' : 'text-primary'
-                  }`}
-                >
-                  {msg.timestamp}
-                </span>
-                {msg.sender === 'me' && (
-                  <span className='text-xs'>
-                    {msg.status === 'read'
-                      ? '✓✓'
-                      : msg.status === 'delivered'
-                        ? '✓✓'
-                        : '✓'}
+              <div
+                className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                  msg.sender === 'me'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground'
+                }`}
+              >
+                <p className='text-sm wrap-break-word'>{msg.content}</p>
+                <div className='flex items-center justify-end gap-1 mt-1'>
+                  <span
+                    className={`text-xs ${
+                      msg.sender === 'me'
+                        ? 'text-muted-foreground'
+                        : 'text-primary'
+                    }`}
+                  >
+                    {msg.timestamp}
                   </span>
-                )}
+                  {msg.sender === 'me' && (
+                    <span className='text-xs'>
+                      {msg.status === 'read'
+                        ? '✓✓'
+                        : msg.status === 'delivered'
+                          ? '✓✓'
+                          : '✓'}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
 
         {isTyping && (
           <div className='flex justify-start'>
@@ -193,7 +215,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
             className='flex-1 px-4 py-2'
           />
 
-          <button type='submit' disabled={!message.trim()} className='p-2'>
+          <button
+            type='submit'
+            disabled={!message.trim()}
+            className='p-2'
+            onClick={handleSend}
+          >
             <Send className='w-6 h-6' />
           </button>
         </form>

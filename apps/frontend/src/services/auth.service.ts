@@ -2,7 +2,7 @@ import axiosInstance from '@/lib/axios';
 
 // Define types based on backend expectations
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   avatar?: string;
