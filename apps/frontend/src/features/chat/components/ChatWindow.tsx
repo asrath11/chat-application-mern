@@ -19,12 +19,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: chat } = useQuery({
+  const { data: chat, isLoading: chatLoading } = useQuery({
     queryKey: ['chat', chatId],
     queryFn: () => getChatById(chatId),
   });
 
-  const { data: messages } = useQuery({
+  const { data: messages = [], refetch: refetchMessages } = useQuery({
     queryKey: ['messages', chatId],
     queryFn: () => getAllMessages(chatId),
   });
@@ -33,13 +33,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Scroll when messages update
   useEffect(() => {
     scrollToBottom();
-  }, []);
+  }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!message.trim()) return;
+
     await sendMessage({
       content: message,
       chat: chatId,
@@ -47,10 +50,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
       timestamp: new Date().toISOString(),
     });
 
-    // TODO: Send message via socket
-    console.log('Sending message:', message);
     setMessage('');
+    refetchMessages(); // refresh messages after sending
   };
+
+  if (chatLoading) {
+    return (
+      <div className='flex items-center justify-center h-full'>
+        <p>Loading chat...</p>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col h-screen w-full'>
@@ -60,12 +70,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
           <div className='relative'>
             <Avatar>
               <AvatarImage src={chat?.avatar} />
-              <AvatarFallback>{chat?.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{chat?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
+
             {chat?.isOnline && (
               <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 rounded-full'></div>
             )}
           </div>
+
           <div>
             <h2 className='font-semibold text-gray-900 dark:text-white'>
               {chat?.name}
@@ -89,43 +101,49 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
 
       {/* Messages Area */}
       <div className='flex-1 overflow-y-auto p-4 space-y-4'>
-        {messages && messages.length === 0 ? (
-          <p className='text-center text-gray-500'>No messages yet</p>
+        {messages.length === 0 ? (
+          <p className='text-center text-muted-foreground'>No messages yet</p>
         ) : (
-          messages?.map((msg: Message) => (
-            <div
-              key={msg._id}
-              className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-            >
+          messages.map((msg: Message) => {
+            const isMe = msg.sender === 'me';
+
+            return (
               <div
-                className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.sender === 'me'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground'
-                  }`}
+                key={msg._id}
+                className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
               >
-                <p className='text-sm wrap-break-word'>{msg.content}</p>
-                <div className='flex items-center justify-end gap-1 mt-1'>
-                  <span
-                    className={`text-xs ${msg.sender === 'me'
-                        ? 'text-muted-foreground'
-                        : 'text-primary'
+                <div
+                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                    isMe
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}
+                >
+                  <p className='text-sm wrap-break-word'>{msg.content}</p>
+
+                  <div className='flex items-center justify-end gap-1 mt-1'>
+                    <span
+                      className={`text-xs ${
+                        isMe ? 'text-muted-foreground' : 'text-primary'
                       }`}
-                  >
-                    {msg.timestamp}
-                  </span>
-                  {msg.sender === 'me' && (
-                    <span className='text-xs'>
-                      {msg.status === 'read'
-                        ? '✓✓'
-                        : msg.status === 'delivered'
-                          ? '✓✓'
-                          : '✓'}
+                    >
+                      {msg.timestamp}
                     </span>
-                  )}
+
+                    {isMe && (
+                      <span className='text-xs'>
+                        {msg.status === 'read'
+                          ? '✓✓'
+                          : msg.status === 'delivered'
+                            ? '✓✓'
+                            : '✓'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
 
         {isTyping && (
@@ -174,12 +192,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
             className='flex-1 px-4 py-2'
           />
 
-          <button
-            type='submit'
-            disabled={!message.trim()}
-            className='p-2'
-            onClick={handleSend}
-          >
+          <button type='submit' disabled={!message.trim()} className='p-2'>
             <Send className='w-6 h-6' />
           </button>
         </form>
