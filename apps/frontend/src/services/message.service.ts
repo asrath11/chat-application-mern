@@ -4,7 +4,11 @@ export interface Message {
   _id?: string;
   content: string;
   chat: string;
-  sender?: string;
+  sender?: string | {
+    _id: string;
+    name: string;
+    avatar?: string;
+  };
   status: 'delivered' | 'read' | 'sent';
   timestamp: string;
   createdAt?: string;

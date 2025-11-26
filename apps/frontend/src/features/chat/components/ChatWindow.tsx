@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { getChatById } from '@/services/chat.service';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useSocket } from '@/context/SocketContext';
+import type { MessageSendPayload, MessageReceivePayload } from '@chat-app/shared-types';
 import {
   getAllMessages,
-  sendMessage,
   type Message,
 } from '@/services/message.service';
 
@@ -18,6 +19,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const [message, setMessage] = useState('');
   const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { socket } = useSocket();
 
   const { data: chat, isLoading: chatLoading } = useQuery({
     queryKey: ['chat', chatId],
@@ -38,21 +41,48 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    // Join the chat room
+    socket.emit('chat:join', { chatId });
+
+    // Listen for incoming messages
+    const handleNewMessage = (data: MessageReceivePayload) => {
+      console.log('📨 Received message in ChatWindow:', data);
+      // Only refetch if the message is for this chat
+      if (data.chatId === chatId) {
+        refetchMessages();
+      }
+    };
+
+    socket.on('message:receive', handleNewMessage);
+
+    // Cleanup on unmount or when chatId changes
+    return () => {
+      socket.emit('chat:leave', { chatId });
+      socket.off('message:receive', handleNewMessage);
+    };
+  }, [socket, chatId, refetchMessages]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!message.trim()) return;
 
-    await sendMessage({
+    const payload: MessageSendPayload = {
       content: message,
       chat: chatId,
-      status: 'sent',
-      timestamp: new Date().toISOString(),
-    });
+    };
+
+    // Emit via socket (backend should save and broadcast)
+    socket?.emit('message:send', payload);
 
     setMessage('');
-    refetchMessages(); // refresh messages after sending
+    // No need to refetch here - the socket listener will handle it
   };
+
+
 
   if (chatLoading) {
     return (
@@ -113,19 +143,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
                 className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                    isMe
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground'
-                  }`}
+                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${isMe
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground'
+                    }`}
                 >
                   <p className='text-sm wrap-break-word'>{msg.content}</p>
 
                   <div className='flex items-center justify-end gap-1 mt-1'>
                     <span
-                      className={`text-xs ${
-                        isMe ? 'text-muted-foreground' : 'text-primary'
-                      }`}
+                      className={`text-xs ${isMe ? 'text-muted-foreground' : 'text-primary'
+                        }`}
                     >
                       {msg.timestamp}
                     </span>

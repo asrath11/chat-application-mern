@@ -1,16 +1,23 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
+import type {
+  ListenEvents,
+  EmitEvents,
+  MessageReceivePayload,
+} from '@chat-app/shared-types';
 import { socketService } from '@/services/socket.service';
 import { authService } from '@/services/auth.service';
 
 interface SocketContextType {
-  socket: Socket | null;
+  socket: Socket<ListenEvents, EmitEvents> | null;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<Socket<ListenEvents, EmitEvents> | null>(
+    null
+  );
 
   useEffect(() => {
     const initSocket = async () => {
@@ -35,11 +42,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!socket) return;
 
-    // Handle new messages
-    const handleNewMessage = (message: any) => {
-      console.log('📨 New message received:', message);
-      // You can dispatch to a global state manager here (Redux, Zustand, etc.)
-      // or emit a custom event that components can listen to
+    const handleNewMessage = (data: MessageReceivePayload) => {
+      console.log('📨 New message received:', data);
     };
 
     // Handle user online status
@@ -62,14 +66,14 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // Register listeners
-    socket.on('new_message', handleNewMessage);
+    socket.on('message:receive', handleNewMessage);
     socket.on('user_online', handleUserOnline);
     socket.on('user_offline', handleUserOffline);
     socket.on('typing', handleTyping);
 
     // Cleanup listeners on unmount or socket change
     return () => {
-      socket.off('new_message', handleNewMessage);
+      socket.off('message:receive', handleNewMessage);
       socket.off('user_online', handleUserOnline);
       socket.off('user_offline', handleUserOffline);
       socket.off('typing', handleTyping);

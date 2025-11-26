@@ -16,8 +16,6 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
     chat,
   });
 
-  message = await message.populate('sender', 'name avatar');
-  message = await message.populate('chat');
   message = await (
     await message.populate({
       path: 'chat',

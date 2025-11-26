@@ -1,8 +1,9 @@
 // lib/socket.js
-import { io, Socket } from 'socket.io-client';
+import { io, type Socket } from 'socket.io-client';
+import type { ListenEvents, EmitEvents } from '@chat-app/shared-types';
 
 class SocketService {
-  private socket: Socket | null = null;
+  private socket: Socket<ListenEvents, EmitEvents> | null = null;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
   private token: string | undefined;
@@ -46,7 +47,7 @@ class SocketService {
       reconnectionAttempts: this.maxReconnectAttempts,
       reconnectionDelay: this.reconnectDelay,
       transports: ['websocket', 'polling'],
-    });
+    }) as Socket<ListenEvents, EmitEvents>;
 
     // Only setup internal listeners once
     if (!this.listenersInitialized) {
@@ -72,14 +73,6 @@ class SocketService {
     this.socket.on('connect_error', (error) => {
       console.error('⚠️ Connection Error:', error.message);
     });
-
-    this.socket.on('reconnect', (attempt) => {
-      console.log(`🔄 Reconnected after ${attempt} attempts`);
-    });
-
-    this.socket.on('reconnect_failed', () => {
-      console.error('❌ Reconnection failed after maximum attempts');
-    });
   }
 
   emit(event: string, data?: any): boolean {
@@ -87,16 +80,16 @@ class SocketService {
       console.warn('⚠️ Socket not connected. Cannot emit:', event);
       return false;
     }
-    this.socket.emit(event, data);
+    this.socket.emit(event as any, data);
     return true;
   }
 
   on(event: string, callback: (...args: any[]) => void) {
-    this.socket?.on(event, callback);
+    this.socket?.on(event as any, callback);
   }
 
   off(event: string, callback?: (...args: any[]) => void) {
-    this.socket?.off(event, callback);
+    this.socket?.off(event as any, callback);
   }
 
   disconnect() {
