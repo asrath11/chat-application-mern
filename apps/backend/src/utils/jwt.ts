@@ -1,31 +1,27 @@
-// src/utils/jwt.ts
 import jwt from 'jsonwebtoken';
 
-const ACCESS_SECRET = process.env.JWT_SECRET!;
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
-const ACCESS_EXPIRES_IN = process.env.JWT_EXPIRES_IN!;
-const REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN!;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'access-secret';
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'refresh-secret';
 
-if (!ACCESS_SECRET || !REFRESH_SECRET) {
-  throw new Error('Missing required JWT environment variables');
-}
+const ACCESS_TOKEN_EXPIRY = '15m';
+const REFRESH_TOKEN_EXPIRY = '7d';
 
-export const generateAccessToken = (userId: string) => {
-  return jwt.sign({ id: userId }, ACCESS_SECRET, {
-    expiresIn: ACCESS_EXPIRES_IN,
-  } as jwt.SignOptions);
+export const generateAccessToken = (userId: string): string => {
+  return jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRY,
+  });
 };
 
-export const generateRefreshToken = (userId: string) => {
-  return jwt.sign({ id: userId }, REFRESH_SECRET, {
-    expiresIn: REFRESH_EXPIRES_IN,
-  } as jwt.SignOptions);
+export const generateRefreshToken = (userId: string): string => {
+  return jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRY,
+  });
 };
 
 export const verifyAccessToken = (token: string) => {
-  return jwt.verify(token, ACCESS_SECRET);
+  return jwt.verify(token, ACCESS_TOKEN_SECRET);
 };
 
 export const verifyRefreshToken = (token: string) => {
-  return jwt.verify(token, REFRESH_SECRET);
+  return jwt.verify(token, REFRESH_TOKEN_SECRET);
 };
