@@ -21,87 +21,90 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     null
   );
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    let isMounted = true;
+    if (!isAuthenticated) {
+      socketService.disconnect();
+      return;
+    }
 
-    const initSocket = async () => {
-      if (!isAuthenticated) {
-        socketService.disconnect();
-        if (isMounted) {
-          setSocket(null);
-          setOnlineUsers([]);
-        }
-        return;
-      }
+    let active = true;
 
+    const start = async () => {
       try {
         const { accessToken } = await authService.getMe();
         const s = socketService.connect(accessToken);
-        if (isMounted) {
+
+        if (active) {
           setSocket(s);
         }
-      } catch (error) {
-        console.error('❌ Failed to initialize socket:', error);
+      } catch (err) {
+        console.error('❌ Failed to init socket:', err);
       }
     };
 
-    initSocket();
+    start();
 
     return () => {
-      isMounted = false;
-      console.log('🔌 Cleaning up socket connection');
+      active = false;
       socketService.disconnect();
+      setSocket(null);
+      setOnlineUsers([]);
     };
   }, [isAuthenticated]);
 
-  // Setup application-level event listeners
+  /* ------------------------- SOCKET LISTENERS ------------------------- */
   useEffect(() => {
     if (!socket) return;
 
+    // New message receive handler
     const handleNewMessage = (data: MessageReceivePayload) => {
-      console.log('📨 New message received:', data);
+      console.log('📨 message:receive', data);
     };
 
+    // Presence full list
     const handlePresenceList = (users: string[]) => {
       setOnlineUsers(users);
     };
 
+    // Online user (single)
     const handlePresenceOnline = (userId: string) => {
       setOnlineUsers((prev) =>
         prev.includes(userId) ? prev : [...prev, userId]
       );
     };
 
+    // Offline user (single)
     const handlePresenceOffline = (userId: string) => {
       setOnlineUsers((prev) => prev.filter((id) => id !== userId));
     };
 
-    // Handle typing indicators
+    // Typing indicator
     const handleTyping = (data: {
       userId: string;
       chatId: string;
       isTyping: boolean;
     }) => {
-      console.log('⌨️ Typing event:', data);
+      console.log('⌨️ typing', data);
     };
 
-    // Register listeners
+    /* --- register listeners --- */
     socket.on('message:receive', handleNewMessage);
     socket.on('presence:list', handlePresenceList);
     socket.on('presence:online', handlePresenceOnline);
     socket.on('presence:offline', handlePresenceOffline);
     socket.on('typing', handleTyping);
 
-    // Cleanup listeners on unmount or socket change
     return () => {
       socket.off('message:receive', handleNewMessage);
       socket.off('presence:list', handlePresenceList);
       socket.off('presence:online', handlePresenceOnline);
       socket.off('presence:offline', handlePresenceOffline);
       socket.off('typing', handleTyping);
-      setOnlineUsers([]);
+
+      // Don't reset onlineUsers unless socket actually disconnects
     };
   }, [socket]);
 
@@ -114,6 +117,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useSocket = () => {
   const context = useContext(SocketContext);
-  if (!context) throw new Error('useSocket must be used within SocketProvider');
+  if (!context) throw new Error('useSocket must be used inside SocketProvider');
   return context;
 };
