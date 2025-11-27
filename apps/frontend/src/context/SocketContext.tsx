@@ -7,9 +7,11 @@ import type {
 } from '@chat-app/shared-types';
 import { socketService } from '@/services/socket.service';
 import { authService } from '@/services/auth.service';
+import { useAuth } from '@/context/AuthContext';
 
 interface SocketContextType {
   socket: Socket<ListenEvents, EmitEvents> | null;
+  onlineUsers: string[];
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -18,13 +20,28 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket<ListenEvents, EmitEvents> | null>(
     null
   );
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    let isMounted = true;
+
     const initSocket = async () => {
+      if (!isAuthenticated) {
+        socketService.disconnect();
+        if (isMounted) {
+          setSocket(null);
+          setOnlineUsers([]);
+        }
+        return;
+      }
+
       try {
         const { accessToken } = await authService.getMe();
         const s = socketService.connect(accessToken);
-        setSocket(s);
+        if (isMounted) {
+          setSocket(s);
+        }
       } catch (error) {
         console.error('❌ Failed to initialize socket:', error);
       }
@@ -33,10 +50,11 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     initSocket();
 
     return () => {
+      isMounted = false;
       console.log('🔌 Cleaning up socket connection');
       socketService.disconnect();
     };
-  }, []);
+  }, [isAuthenticated]);
 
   // Setup application-level event listeners
   useEffect(() => {
@@ -46,14 +64,18 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('📨 New message received:', data);
     };
 
-    // Handle user online status
-    const handleUserOnline = (userId: string) => {
-      console.log('🟢 User online:', userId);
+    const handlePresenceList = (users: string[]) => {
+      setOnlineUsers(users);
     };
 
-    // Handle user offline status
-    const handleUserOffline = (userId: string) => {
-      console.log('🔴 User offline:', userId);
+    const handlePresenceOnline = (userId: string) => {
+      setOnlineUsers((prev) =>
+        prev.includes(userId) ? prev : [...prev, userId]
+      );
+    };
+
+    const handlePresenceOffline = (userId: string) => {
+      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
     };
 
     // Handle typing indicators
@@ -67,21 +89,26 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Register listeners
     socket.on('message:receive', handleNewMessage);
-    socket.on('user_online', handleUserOnline);
-    socket.on('user_offline', handleUserOffline);
+    socket.on('presence:list', handlePresenceList);
+    socket.on('presence:online', handlePresenceOnline);
+    socket.on('presence:offline', handlePresenceOffline);
     socket.on('typing', handleTyping);
 
     // Cleanup listeners on unmount or socket change
     return () => {
       socket.off('message:receive', handleNewMessage);
-      socket.off('user_online', handleUserOnline);
-      socket.off('user_offline', handleUserOffline);
+      socket.off('presence:list', handlePresenceList);
+      socket.off('presence:online', handlePresenceOnline);
+      socket.off('presence:offline', handlePresenceOffline);
       socket.off('typing', handleTyping);
+      setOnlineUsers([]);
     };
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{ socket, onlineUsers }}>
+      {children}
+    </SocketContext.Provider>
   );
 };
 

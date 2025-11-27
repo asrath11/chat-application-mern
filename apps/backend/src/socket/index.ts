@@ -59,11 +59,6 @@ export const initializeSocket = (httpServer: HTTPServer) => {
     registerMessageHandlers(io, socket);
     registerPresenceHandlers(io, socket);
     registerTypingHandlers(io, socket);
-
-    // Disconnect handler
-    socket.on('disconnect', () => {
-      console.log(`❌ User disconnected: ${socket.userId} (${socket.id})`);
-    });
   });
 
   return io;

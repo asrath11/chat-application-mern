@@ -2,7 +2,6 @@ import { Server, Socket } from 'socket.io';
 import { AuthenticatedSocket } from '../index';
 import Message from '@/models/message.model';
 import { IUser } from '@/models/user.model';
-import Chat from '@/models/chat.model';
 import {
   MessageSendPayload,
   MessageDeliveredPayload,
@@ -25,8 +24,6 @@ export const registerMessageHandlers = (
     // Populate sender details
     await message.populate('sender', 'name avatar');
 
-    console.log('📤 Message created:', message);
-
     // Cast sender to IUser after population
     const sender = message.sender as unknown as IUser;
 
@@ -45,6 +42,7 @@ export const registerMessageHandlers = (
         createdAt: message.createdAt.toISOString(),
         updatedAt: message.updatedAt.toISOString(),
       },
+      status: 'read',
       chatId: data.chat,
     });
   });

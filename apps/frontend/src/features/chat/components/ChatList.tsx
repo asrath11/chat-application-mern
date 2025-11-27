@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { allChats } from '@/services/chat.service';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useSocket } from '@/context/SocketContext';
 
 interface ChatListProps {
   activeChatId?: string;
@@ -13,6 +14,8 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
   const { user } = useAuth();
+  const { onlineUsers } = useSocket();
+  console.log(onlineUsers);
   const navigate = useNavigate();
 
   const {
@@ -61,60 +64,67 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
             No chats available
           </div>
         ) : (
-          chats?.map((chat) => (
-            <div
-              key={chat.id}
-              className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-b ${
-                activeChatId === chat.id ? 'bg-muted' : ''
+          chats?.map((chat) => {
+            const isOnline = chat.userId
+              ? onlineUsers.includes(chat.userId)
+              : chat.isOnline;
+            const isActive = chat.id === activeChatId;
+
+            return (
+              <button
+                key={chat.id}
+                type='button'
+                onClick={() => navigate(`/chat/${chat.id}`)}
+                className={`w-full flex items-center gap-4 p-4 border-b hover:bg-accent/40 transition-colors text-left ${
+                  isActive ? 'bg-accent/60' : ''
                 }`}
-              onClick={() => navigate(`/chat/${chat.id}`)}
-            >
-              {/* Avatar */}
-              <div className='relative shrink-0'>
-                <Avatar>
-                  <AvatarImage src={chat.avatar} alt={chat.name} />
-                  <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+              >
+                <div className='relative'>
+                  <Avatar>
+                    <AvatarImage src={chat.avatar} alt={chat.name} />
+                    <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
 
-                {chat.isOnline && (
-                  <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 rounded-full'></div>
-                )}
-              </div>
-
-              {/* Chat Info */}
-              <div className='flex-1 min-w-0'>
-                {/* Name + Timestamp */}
-                <div
-                  className={`flex justify-between ${
-                    chat.lastMessage ? 'items-start mb-1' : 'items-center'
-                  }`}
-                >
-                  <h3 className='font-semibold text-primary truncate'>
-                    {chat.name}
-                  </h3>
-
-                  <span className='text-xs text-muted-foreground shrink-0 ml-2'>
-                    {chat.timestamp}
-                  </span>
+                  {isOnline && (
+                    <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-card rounded-full' />
+                  )}
                 </div>
 
-                {/* Message + Unread */}
-                {chat.lastMessage && (
-                  <div className='flex items-center justify-between'>
-                    <p className='text-sm text-muted-foreground truncate'>
-                      {chat.lastMessage}
-                    </p>
+                {/* Chat Info */}
+                <div className='flex-1 min-w-0'>
+                  {/* Name + Timestamp */}
+                  <div
+                    className={`flex justify-between ${
+                      chat.lastMessage ? 'items-start mb-1' : 'items-center'
+                    }`}
+                  >
+                    <h3 className='font-semibold text-primary truncate'>
+                      {chat.name}
+                    </h3>
 
-                    {(chat.unread ?? 0) > 0 && (
-                      <span className='shrink-0 ml-2 px-2 py-0.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full'>
-                        {chat.unread}
-                      </span>
-                    )}
+                    <span className='text-xs text-muted-foreground shrink-0 ml-2'>
+                      {chat.timestamp}
+                    </span>
                   </div>
-                )}
-              </div>
-            </div>
-          ))
+
+                  {/* Message + Unread */}
+                  {chat.lastMessage && (
+                    <div className='flex items-center justify-between'>
+                      <p className='text-sm text-muted-foreground truncate'>
+                        {chat.lastMessage}
+                      </p>
+
+                      {(chat.unread ?? 0) > 0 && (
+                        <span className='shrink-0 ml-2 px-2 py-0.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full'>
+                          {chat.unread}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })
         )}
       </div>
 

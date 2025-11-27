@@ -1,7 +1,36 @@
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import { AuthenticatedSocket } from '../index';
 
-export const registerPresenceHandlers = (io: Server, socket: Socket) => {};
+const onlineUsers = new Map<string, string>(); // userId -> socketId
 
-export const isUserOnline = (userId: string) => {};
+export const registerPresenceHandlers = (
+  io: Server,
+  socket: AuthenticatedSocket
+) => {
+  socket.emit('presence:list', getOnlineUsers());
+  handleUserConnect(io, socket);
 
-export const getOnlineUsers = () => {};
+  socket.on('disconnect', () => {
+    handleUserDisconnect(io, socket);
+  });
+};
+
+export const handleUserConnect = (io: Server, socket: AuthenticatedSocket) => {
+  if (socket.userId) {
+    onlineUsers.set(socket.userId, socket.id);
+    io.emit('presence:online', socket.userId);
+    console.log(`User ${socket.userId} is online`);
+  }
+};
+
+export const handleUserDisconnect = (io: Server, socket: AuthenticatedSocket) => {
+  if (socket.userId) {
+    onlineUsers.delete(socket.userId);
+    io.emit('presence:offline', socket.userId);
+    console.log(`User ${socket.userId} is offline`);
+  }
+};
+
+export const getOnlineUsers = () => {
+  return Array.from(onlineUsers.keys());
+};

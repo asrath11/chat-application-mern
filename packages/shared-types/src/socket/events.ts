@@ -79,7 +79,8 @@ export interface ListenEvents {
   'chat:join': (data: { chatId: string }) => void;
   'chat:leave': (data: { chatId: string }) => void;
   typing: (data: TypingPayload) => void;
-  user_online: (userId: string) => void;
-  user_offline: (userId: string) => void;
+  'presence:list': (userIds: string[]) => void;
+  'presence:online': (userId: string) => void;
+  'presence:offline': (userId: string) => void;
   error: (data: ErrorPayload) => void;
 }

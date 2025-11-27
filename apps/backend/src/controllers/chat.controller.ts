@@ -45,6 +45,7 @@ export const allChats = asyncHandler(async (req: Request, res: Response) => {
 
       return {
         id: chat._id,
+        userId: user._id,
         name: user.name,
         avatar: user.avatar || '',
         lastMessage: chat.latestMessage?.content || '',
@@ -72,6 +73,7 @@ export const getChatById = asyncHandler(async (req: Request, res: Response) => {
 
   const formattedChat = {
     id: chat._id,
+    userId: user._id,
     name: user.name,
     avatar: user.avatar || '',
     timestamp: chat.updatedAt.toISOString(),

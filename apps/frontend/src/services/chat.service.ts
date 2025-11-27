@@ -6,6 +6,7 @@ export interface BaseChat {
   avatar?: string;
   isOnline?: boolean;
   lastSeen: string;
+  userId?: string;
 }
 
 export interface ChatResponse extends BaseChat {

@@ -5,11 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { getChatById } from '@/services/chat.service';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSocket } from '@/context/SocketContext';
-import type { MessageSendPayload, MessageReceivePayload } from '@chat-app/shared-types';
-import {
-  getAllMessages,
-  type Message,
-} from '@/services/message.service';
+import type {
+  MessageSendPayload,
+  MessageReceivePayload,
+} from '@chat-app/shared-types';
+import { getAllMessages, type Message } from '@/services/message.service';
 
 interface ChatWindowProps {
   chatId: string;
@@ -19,6 +19,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const [message, setMessage] = useState('');
   const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { onlineUsers } = useSocket();
 
   const { socket } = useSocket();
 
@@ -79,10 +80,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     socket?.emit('message:send', payload);
 
     setMessage('');
-    // No need to refetch here - the socket listener will handle it
   };
-
-
 
   if (chatLoading) {
     return (
@@ -103,7 +101,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
               <AvatarFallback>{chat?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
 
-            {chat?.isOnline && (
+            {onlineUsers.includes(chat?.userId || '') && (
               <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 rounded-full'></div>
             )}
           </div>
@@ -143,17 +141,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
                 className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${isMe
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground'
-                    }`}
+                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                    isMe
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}
                 >
                   <p className='text-sm wrap-break-word'>{msg.content}</p>
 
                   <div className='flex items-center justify-end gap-1 mt-1'>
                     <span
-                      className={`text-xs ${isMe ? 'text-muted-foreground' : 'text-primary'
-                        }`}
+                      className={`text-xs ${
+                        isMe ? 'text-muted-foreground' : 'text-primary'
+                      }`}
                     >
                       {msg.timestamp}
                     </span>
