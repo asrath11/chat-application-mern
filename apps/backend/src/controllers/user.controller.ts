@@ -11,9 +11,8 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
 
   const users = await User.find(
     { _id: { $ne: currentUserId } },
-    { userName: 1, _id: 0, avatar: 1 }
+    { userName: 1, avatar: 1, id: '$_id' }
   ).lean();
-
   res.status(200).json(users);
 });
 

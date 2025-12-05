@@ -1,6 +1,7 @@
 import axiosInstance from '@/lib/axios';
 
 export type UserListItem = {
+  id: string;
   userName: string;
   avatar?: string;
 };

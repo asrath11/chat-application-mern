@@ -3,7 +3,7 @@ import { Send, Smile, Paperclip, MoreVertical, Phone, Video } from 'lucide-react
 import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { getChatById } from '@/services/chat.service';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/common/Avatar';
 import { useSocket } from '@/context/SocketContext';
 import type {
   MessageSendPayload,
@@ -97,10 +97,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
       <div className='flex items-center justify-between p-4 bg-card border-b'>
         <div className='flex items-center gap-3'>
           <div className='relative'>
-            <Avatar>
-              <AvatarImage src={chat?.avatar} />
-              <AvatarFallback>{chat?.name?.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <Avatar name={chat?.name || ''} />
 
             {onlineUsers.includes(chat?.userId || '') && (
               <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 rounded-full'></div>

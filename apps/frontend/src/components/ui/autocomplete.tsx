@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, KeyboardEvent } from 'react';
 import { Input } from './input';
 import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AutocompleteProps {
   options: string[];
@@ -10,6 +11,8 @@ interface AutocompleteProps {
   placeholder?: string;
   emptyMessage?: string;
   onSelect?: (value: string) => void;
+  renderOption?: (option: string) => React.ReactNode;
+  className?: string;
 }
 
 export function Autocomplete({
@@ -19,9 +22,12 @@ export function Autocomplete({
   placeholder = 'Type to search...',
   emptyMessage = 'No results found.',
   onSelect,
+  renderOption,
+  className,
 }: AutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value || '');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -47,6 +53,10 @@ export function Autocomplete({
     setInputValue(value || '');
   }, [value]);
 
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [filteredOptions.length]);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
@@ -68,8 +78,39 @@ export function Autocomplete({
     inputRef.current?.focus();
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (!open) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        setOpen(true);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < filteredOptions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (filteredOptions[highlightedIndex]) {
+          handleSelect(filteredOptions[highlightedIndex]);
+        }
+        break;
+      case 'Escape':
+        setOpen(false);
+        break;
+    }
+  };
+
   return (
-    <div className='relative w-full' ref={dropdownRef}>
+    <div className={cn('relative w-full', className)} ref={dropdownRef}>
       <div className='relative'>
         <Input
           ref={inputRef}
@@ -77,12 +118,15 @@ export function Autocomplete({
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => inputValue && setOpen(true)}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          role='combobox'
         />
         {inputValue && (
           <button
             onClick={handleClear}
             className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer hover:bg-accent p-1 rounded-2xl'
+            aria-label='Clear search'
           >
             <X className='h-4 w-4' />
           </button>
@@ -90,18 +134,30 @@ export function Autocomplete({
       </div>
 
       {open && filteredOptions.length > 0 && (
-        <div className='absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg max-h-64 overflow-y-auto'>
+        <ul
+          id='autocomplete-list'
+          role='listbox'
+          className='absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg max-h-64 overflow-y-auto'
+        >
           {filteredOptions.map((option, index) => (
-            <button
+            <li
               key={index}
-              type='button'
+              id={`option-${index}`}
+              role='option'
+              aria-selected={index === highlightedIndex}
               onClick={() => handleSelect(option)}
-              className='flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer text-left'
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={cn(
+                'flex w-full items-center px-3 py-2 text-sm cursor-pointer text-left gap-2',
+                index === highlightedIndex
+                  ? 'bg-accent text-accent-foreground'
+                  : 'hover:bg-accent hover:text-accent-foreground'
+              )}
             >
-              {option}
-            </button>
+              {renderOption ? renderOption(option) : option}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {open && inputValue && filteredOptions.length === 0 && (

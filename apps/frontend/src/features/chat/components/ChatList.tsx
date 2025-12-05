@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/input';
 import { allChats } from '@/services/chat.service';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/common/Avatar';
 import { useSocket } from '@/context/SocketContext';
 import { ChatInvite } from '@/features/chat/components/ChatInvite';
 
@@ -15,8 +15,8 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
   const { user } = useAuth();
+  console.log(user);
   const { onlineUsers } = useSocket();
-  console.log(onlineUsers);
   const navigate = useNavigate();
 
   const {
@@ -74,14 +74,12 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
                 key={chat.id}
                 type='button'
                 onClick={() => navigate(`/chat/${chat.id}`)}
-                className={`w-full flex items-center gap-4 p-4 border-b hover:bg-accent/40 transition-colors text-left ${isActive ? 'bg-accent/60' : ''
-                  }`}
+                className={`w-full flex items-center gap-4 p-4 border-b hover:bg-accent/40 transition-colors text-left ${
+                  isActive ? 'bg-accent/60' : ''
+                }`}
               >
                 <div className='relative'>
-                  <Avatar>
-                    <AvatarImage src={chat.avatar} alt={chat.name} />
-                    <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                  <Avatar name={chat.name} />
 
                   {isOnline && (
                     <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-card rounded-full' />
@@ -92,8 +90,9 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
                 <div className='flex-1 min-w-0'>
                   {/* Name + Timestamp */}
                   <div
-                    className={`flex justify-between ${chat.lastMessage ? 'items-start mb-1' : 'items-center'
-                      }`}
+                    className={`flex justify-between ${
+                      chat.lastMessage ? 'items-start mb-1' : 'items-center'
+                    }`}
                   >
                     <h3 className='font-semibold text-primary truncate'>
                       {chat.name}
@@ -130,17 +129,10 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
       {/* User Profile Footer */}
       <div className='p-4 border-t'>
         <div className='flex items-center gap-3'>
-          <img
-            src={
-              user?.avatar ||
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.userName}`
-            }
-            alt={user?.userName}
-            className='w-10 h-10 rounded-full'
-          />
+          <Avatar name={user?.name || ''} />
 
           <div className='flex-1 min-w-0'>
-            <p className='font-semibold text-primary truncate'>{user?.userName}</p>
+            <p className='font-semibold text-primary truncate'>{user?.name}</p>
             <p className='text-xs text-muted-foreground truncate'>
               {user?.email}
             </p>

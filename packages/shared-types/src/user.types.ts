@@ -1,5 +1,5 @@
 export interface IUser {
-  userName: string;
+  name: string;
   email: string;
   password?: string; // Optional because it's not always returned
   avatar?: string;

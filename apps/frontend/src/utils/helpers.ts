@@ -15,14 +15,3 @@ export const generateRandomColor = (seed: string): string => {
   const hue = hash % 360;
   return `hsl(${hue}, 70%, 60%)`;
 };
-
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
