@@ -1,15 +1,15 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Header } from './Header';
 
 interface LayoutProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
-            <main className="container mx-auto">{children}</main>
-        </div>
-    );
+  return (
+    <div className='min-h-screen bg-gray-50'>
+      <Header />
+      <main className='container mx-auto'>{children}</main>
+    </div>
+  );
 };

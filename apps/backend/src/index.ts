@@ -44,9 +44,9 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoute);
-app.use('/api/chat', chatRoute);
-app.use('/api/user', userRoute);
-app.use('/api/message', messageRoute);
+app.use('/api/chats', chatRoute);
+app.use('/api/users', userRoute);
+app.use('/api/messages', messageRoute);
 
 // Start server
 httpServer.listen(config.port, () => {

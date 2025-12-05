@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-  authService,
-  type LoginCredentials,
-  type RegisterCredentials,
-  type User,
-} from '@/services/auth.service';
+import { authService } from '@/services/auth.service';
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+  User,
+} from '@chat-app/shared-types';
 
 interface AuthContextType {
   user: User | null;

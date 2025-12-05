@@ -3,7 +3,7 @@ import type { Message } from '@chat-app/shared-types';
 
 export const sendMessage = async (message: Message) => {
   try {
-    const response = await axiosInstance.post('/message', message);
+    const response = await axiosInstance.post('/messages', message);
     return response.data;
   } catch (error) {
     console.error('Error sending message:', error);
@@ -13,7 +13,7 @@ export const sendMessage = async (message: Message) => {
 
 export const getAllMessages = async (chatId: string) => {
   try {
-    const response = await axiosInstance.get(`/message?chat=${chatId}`);
+    const response = await axiosInstance.get(`/messages?chat=${chatId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching messages:', error);

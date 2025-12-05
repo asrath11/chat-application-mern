@@ -12,12 +12,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { MessageSquarePlus } from 'lucide-react';
 import { Autocomplete } from '@/components/ui/autocomplete';
-
-const list = ["asrath", "bablu"]
+import { useQuery } from '@tanstack/react-query';
+import { userService } from '@/services/user.service';
 
 export function ChatInvite() {
   const [selectedUser, setSelectedUser] = useState('');
-
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: userService.getAllUsers,
+  });
+  const userOptions = users.map((user) => user.userName);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Inviting user:', selectedUser);
@@ -40,17 +44,19 @@ export function ChatInvite() {
           <div className='grid gap-4 py-4'>
             <div className='grid gap-3'>
               <Autocomplete
-                options={list}
+                options={userOptions}
                 value={selectedUser}
                 onChange={setSelectedUser}
-                placeholder="Search users..."
-                emptyMessage="No users found"
+                placeholder='Search users...'
+                emptyMessage='No users found'
               />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant='outline' type='button'>Cancel</Button>
+              <Button variant='outline' type='button'>
+                Cancel
+              </Button>
             </DialogClose>
             <Button type='submit' disabled={!selectedUser}>
               Send Invite

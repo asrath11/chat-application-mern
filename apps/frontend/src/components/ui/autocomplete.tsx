@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
-import type { ChangeEvent } from 'react'
+import { useState, useEffect, useRef } from 'react';
+import type { ChangeEvent } from 'react';
 import { Input } from './input';
-import { Button } from './button';
-import { X } from 'lucide-react'
+import { X } from 'lucide-react';
 
 interface AutocompleteProps {
   options: string[];
@@ -17,9 +16,9 @@ export function Autocomplete({
   options = [],
   value,
   onChange,
-  placeholder = "Type to search...",
-  emptyMessage = "No results found.",
-  onSelect
+  placeholder = 'Type to search...',
+  emptyMessage = 'No results found.',
+  onSelect,
 }: AutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value || '');
@@ -32,7 +31,10 @@ export function Autocomplete({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -67,11 +69,11 @@ export function Autocomplete({
   };
 
   return (
-    <div className="relative w-full" ref={dropdownRef}>
-      <div className="relative">
+    <div className='relative w-full' ref={dropdownRef}>
+      <div className='relative'>
         <Input
           ref={inputRef}
-          type="text"
+          type='text'
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => inputValue && setOpen(true)}
@@ -80,21 +82,21 @@ export function Autocomplete({
         {inputValue && (
           <button
             onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer hover:bg-accent p-1 rounded-2xl"
+            className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer hover:bg-accent p-1 rounded-2xl'
           >
-            <X className="h-4 w-4" />
+            <X className='h-4 w-4' />
           </button>
         )}
       </div>
 
       {open && filteredOptions.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg max-h-64 overflow-y-auto">
+        <div className='absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg max-h-64 overflow-y-auto'>
           {filteredOptions.map((option, index) => (
             <button
               key={index}
-              type="button"
+              type='button'
               onClick={() => handleSelect(option)}
-              className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer text-left"
+              className='flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer text-left'
             >
               {option}
             </button>
@@ -103,10 +105,8 @@ export function Autocomplete({
       )}
 
       {open && inputValue && filteredOptions.length === 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border shadow-lg bg-background">
-          <div className="py-6 text-center text-sm">
-            {emptyMessage}
-          </div>
+        <div className='absolute z-50 mt-1 w-full rounded-md border shadow-lg bg-background'>
+          <div className='py-6 text-center text-sm'>{emptyMessage}</div>
         </div>
       )}
     </div>

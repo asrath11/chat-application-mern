@@ -13,18 +13,18 @@ export const API_ROUTES = {
     PROFILE: '/auth/profile',
   },
   CHAT: {
-    LIST: '/chat',
-    CREATE: '/chat',
-    GET: (id: string) => `/chat/${id}`,
-    UPDATE: (id: string) => `/chat/${id}`,
-    DELETE: (id: string) => `/chat/${id}`,
+    LIST: '/chats',
+    CREATE: '/chats',
+    GET: (id: string) => `/chats/${id}`,
+    UPDATE: (id: string) => `/chats/${id}`,
+    DELETE: (id: string) => `/chats/${id}`,
   },
   MESSAGE: {
-    LIST: (chatId: string) => `/message/${chatId}`,
-    SEND: '/message',
-    DELETE: (id: string) => `/message/${id}`,
+    LIST: (chatId: string) => `/messages/${chatId}`,
+    SEND: '/messages',
+    DELETE: (id: string) => `/messages/${id}`,
   },
   USER: {
-    SEARCH: '/user/search',
+    SEARCH: '/users/search',
   },
 } as const;
