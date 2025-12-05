@@ -46,7 +46,7 @@ export const allChats = asyncHandler(async (req: Request, res: Response) => {
       return {
         id: chat._id,
         userId: user._id,
-        name: user.name,
+        name: user.userName,
         avatar: user.avatar || '',
         lastMessage: chat.latestMessage?.content || '',
         timestamp: chat.updatedAt.toISOString(),
@@ -74,7 +74,7 @@ export const getChatById = asyncHandler(async (req: Request, res: Response) => {
   const formattedChat = {
     id: chat._id,
     userId: user._id,
-    name: user.name,
+    name: user.userName,
     avatar: user.avatar || '',
     timestamp: chat.updatedAt.toISOString(),
     isOnline: user.isOnline,

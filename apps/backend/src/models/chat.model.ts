@@ -1,8 +1,9 @@
 import mongoose, { Document, Schema, model } from 'mongoose';
+import { IChat as ISharedChat } from '@chat-app/shared-types';
 
-export interface IChat extends Document {
-  chatName?: string;
-  isGroupChat: boolean;
+export interface IChat
+  extends Document,
+    Omit<ISharedChat, 'participants' | 'latestMessage' | 'groupAdmin'> {
   participants: mongoose.Types.ObjectId[];
   latestMessage?: mongoose.Types.ObjectId;
   groupAdmin?: mongoose.Types.ObjectId;

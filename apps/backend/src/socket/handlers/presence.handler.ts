@@ -19,7 +19,6 @@ export const handleUserConnect = (io: Server, socket: AuthenticatedSocket) => {
   if (socket.userId) {
     onlineUsers.set(socket.userId, socket.id);
     io.emit('presence:online', socket.userId);
-    console.log(`User ${socket.userId} is online`);
   }
 };
 
@@ -27,7 +26,6 @@ export const handleUserDisconnect = (io: Server, socket: AuthenticatedSocket) =>
   if (socket.userId) {
     onlineUsers.delete(socket.userId);
     io.emit('presence:offline', socket.userId);
-    console.log(`User ${socket.userId} is offline`);
   }
 };
 

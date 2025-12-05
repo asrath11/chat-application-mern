@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import type {
-  ListenEvents,
-  EmitEvents,
+  ServerToClientEvents,
+  ClientToServerEvents,
   MessageReceivePayload,
 } from '@chat-app/shared-types';
 import { socketService } from '@/services/socket.service';
@@ -10,16 +10,17 @@ import { authService } from '@/services/auth.service';
 import { useAuth } from '@/context/AuthContext';
 
 interface SocketContextType {
-  socket: Socket<ListenEvents, EmitEvents> | null;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   onlineUsers: string[];
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const [socket, setSocket] = useState<Socket<ListenEvents, EmitEvents> | null>(
-    null
-  );
+  const [socket, setSocket] = useState<Socket<
+    ServerToClientEvents,
+    ClientToServerEvents
+  > | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const { isAuthenticated } = useAuth();

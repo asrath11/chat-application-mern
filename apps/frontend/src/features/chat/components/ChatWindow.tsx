@@ -8,8 +8,9 @@ import { useSocket } from '@/context/SocketContext';
 import type {
   MessageSendPayload,
   MessageReceivePayload,
+  Message,
 } from '@chat-app/shared-types';
-import { getAllMessages, type Message } from '@/services/message.service';
+import { getAllMessages } from '@/services/message.service';
 
 interface ChatWindowProps {
   chatId: string;
@@ -110,7 +111,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
             <h2 className='font-semibold text-gray-900 dark:text-white'>
               {chat?.name}
             </h2>
-            <p className='text-xs'>{chat?.lastSeen}</p>
+            <p className='text-xs'>
+              {chat?.lastSeen ? new Date(chat.lastSeen).toLocaleString() : ''}
+            </p>
           </div>
         </div>
 
@@ -155,7 +158,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
                         isMe ? 'text-muted-foreground' : 'text-primary'
                       }`}
                     >
-                      {msg.timestamp}
+                      {msg.timestamp
+                        ? new Date(msg.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : ''}
                     </span>
 
                     {isMe && (

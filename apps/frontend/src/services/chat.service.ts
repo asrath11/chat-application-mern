@@ -1,21 +1,8 @@
 import axiosInstance from '@/lib/axios';
-
-export interface BaseChat {
-  id: string;
-  name: string;
-  avatar?: string;
-  isOnline?: boolean;
-  lastSeen: string;
-  userId?: string;
-}
-
-export interface ChatResponse extends BaseChat {
-  unread?: number;
-  lastMessage?: string;
-  timestamp: string;
-}
-
-export type GetChatByIdResponse = BaseChat;
+import type {
+  ChatResponse,
+  GetChatByIdResponse,
+} from '@chat-app/shared-types';
 
 export const createChat = async (userId: string): Promise<ChatResponse> => {
   const response = await axiosInstance.post<ChatResponse>('/chat', { userId });

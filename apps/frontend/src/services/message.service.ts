@@ -1,19 +1,5 @@
 import axiosInstance from '@/lib/axios';
-
-export interface Message {
-  _id?: string;
-  content: string;
-  chat: string;
-  sender?: string | {
-    _id: string;
-    name: string;
-    avatar?: string;
-  };
-  status: 'delivered' | 'read' | 'sent';
-  timestamp: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import type { Message } from '@chat-app/shared-types';
 
 export const sendMessage = async (message: Message) => {
   try {

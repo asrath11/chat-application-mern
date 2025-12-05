@@ -1,15 +1,13 @@
 import mongoose, { Document, Model } from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
+import { IUser as ISharedUser } from '@chat-app/shared-types';
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
+export interface IUser
+  extends Document,
+  Omit<ISharedUser, '_id' | 'createdAt' | 'updatedAt'> {
+  userName: string;
   password: string;
-  avatar?: string;
-  refreshToken?: string;
-  isOnline: boolean;
-  lastSeen: Date;
   comparePassword(enteredPassword: string): Promise<boolean>;
   createdAt: Date;
   updatedAt: Date;
@@ -18,9 +16,10 @@ export interface IUser extends Document {
 export interface IUserModel extends Model<IUser> {}
 const userSchema = new mongoose.Schema<IUser>(
   {
-    name: {
+    userName: {
       type: String,
       required: [true, 'Name is required'],
+      unique:true
     },
     email: {
       type: String,

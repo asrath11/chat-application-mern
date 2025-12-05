@@ -36,7 +36,7 @@ export default function SignUp() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
+      userName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -76,13 +76,13 @@ export default function SignUp() {
                 {/* Name Field */}
                 <FormField
                   control={form.control}
-                  name='name'
+                  name='userName'
                   render={({ field }) => (
                     <FormItem className='grid gap-2'>
-                      <FormLabel htmlFor='name'>Full Name</FormLabel>
+                      <FormLabel htmlFor='userName'>user name</FormLabel>
                       <FormControl>
                         <Input
-                          id='name'
+                          id='userName'
                           placeholder='John Doe'
                           disabled={isLoading}
                           {...field}

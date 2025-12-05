@@ -8,10 +8,22 @@ import {
   verifyRefreshToken,
 } from '@/utils/jwt';
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+const formatUserResponse = (user: any) => {
+  const userObj = user.toObject();
+  return {
+    id: userObj._id.toString(),
+    email: userObj.email,
+    name: userObj.userName,
+    avatar: userObj.avatar,
+    createdAt: userObj.createdAt,
+    updatedAt: userObj.updatedAt,
+  };
+};
 
-  if (!name || !email || !password) {
+export const register = asyncHandler(async (req: Request, res: Response) => {
+  const { userName, email, password } = req.body;
+
+  if (!userName || !email || !password) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -22,7 +34,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Create user
-  const user = await User.create({ name, email, password });
+  const user = await User.create({ userName, email, password });
 
   // Generate tokens
   const accessToken = generateAccessToken(user._id.toString());
@@ -37,14 +49,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   generateCookie(res, refreshToken, 'refreshToken');
 
   return res.status(201).json({
-    user: {
-      id: user._id.toString(),
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    },
+    user: formatUserResponse(user),
   });
 });
 
@@ -79,14 +84,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   generateCookie(res, refreshToken, 'refreshToken');
 
   return res.status(200).json({
-    user: {
-      id: user._id.toString(),
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    },
+    user: formatUserResponse(user),
   });
 });
 
@@ -143,14 +141,7 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
   const accessToken = generateAccessToken(user._id.toString());
 
   return res.status(200).json({
-    user: {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    },
+    user: formatUserResponse(user),
     accessToken,
   });
 });

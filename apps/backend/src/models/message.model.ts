@@ -1,10 +1,11 @@
 import mongoose, { Document, model, Schema } from 'mongoose';
+import { IMessage as ISharedMessage } from '@chat-app/shared-types';
 
-export interface IMessage extends Document {
+export interface IMessage
+  extends Document,
+    Omit<ISharedMessage, 'sender' | 'chat'> {
   sender: mongoose.Types.ObjectId;
-  content: string;
   chat: mongoose.Types.ObjectId;
-  status: 'sent' | 'delivered' | 'read';
   createdAt: Date;
   updatedAt: Date;
 }

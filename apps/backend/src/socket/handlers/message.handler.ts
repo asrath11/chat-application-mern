@@ -33,7 +33,7 @@ export const registerMessageHandlers = (
         _id: message._id.toString(),
         sender: {
           _id: sender._id.toString(),
-          name: sender.name,
+          name: sender.userName,
           avatar: sender.avatar,
         },
         chat: message.chat.toString(),

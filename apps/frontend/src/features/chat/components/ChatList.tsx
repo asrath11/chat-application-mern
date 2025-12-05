@@ -1,12 +1,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, MessageSquarePlus } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/input';
 import { allChats } from '@/services/chat.service';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSocket } from '@/context/SocketContext';
+import { ChatInvite } from '@/features/chat/components/ChatInvite';
 
 interface ChatListProps {
   activeChatId?: string;
@@ -33,9 +34,7 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
       <div className='p-4 border-b'>
         <div className='flex items-center justify-between mb-4'>
           <h1 className='text-2xl font-bold'>Chats</h1>
-          <button className='p-2 rounded-full transition-colors'>
-            <MessageSquarePlus className='w-6 h-6 bg-muted' />
-          </button>
+          <ChatInvite />
         </div>
 
         {/* Search Bar */}
@@ -75,9 +74,8 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
                 key={chat.id}
                 type='button'
                 onClick={() => navigate(`/chat/${chat.id}`)}
-                className={`w-full flex items-center gap-4 p-4 border-b hover:bg-accent/40 transition-colors text-left ${
-                  isActive ? 'bg-accent/60' : ''
-                }`}
+                className={`w-full flex items-center gap-4 p-4 border-b hover:bg-accent/40 transition-colors text-left ${isActive ? 'bg-accent/60' : ''
+                  }`}
               >
                 <div className='relative'>
                   <Avatar>
@@ -94,16 +92,17 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
                 <div className='flex-1 min-w-0'>
                   {/* Name + Timestamp */}
                   <div
-                    className={`flex justify-between ${
-                      chat.lastMessage ? 'items-start mb-1' : 'items-center'
-                    }`}
+                    className={`flex justify-between ${chat.lastMessage ? 'items-start mb-1' : 'items-center'
+                      }`}
                   >
                     <h3 className='font-semibold text-primary truncate'>
                       {chat.name}
                     </h3>
 
                     <span className='text-xs text-muted-foreground shrink-0 ml-2'>
-                      {chat.timestamp}
+                      {chat.timestamp
+                        ? new Date(chat.timestamp).toLocaleDateString()
+                        : ''}
                     </span>
                   </div>
 
@@ -134,14 +133,14 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
           <img
             src={
               user?.avatar ||
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name}`
+              `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.userName}`
             }
-            alt={user?.name}
+            alt={user?.userName}
             className='w-10 h-10 rounded-full'
           />
 
           <div className='flex-1 min-w-0'>
-            <p className='font-semibold text-primary truncate'>{user?.name}</p>
+            <p className='font-semibold text-primary truncate'>{user?.userName}</p>
             <p className='text-xs text-muted-foreground truncate'>
               {user?.email}
             </p>
