@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/input';
@@ -17,8 +17,30 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
   const { user, logout } = useAuth();
-  const { onlineUsers } = useSocket();
+  const { onlineUsers, socket } = useSocket();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleNewMessage = () => {
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+    };
+    const handleChatRead = (data: { chatId: string; userId: string }) => {
+      // If we (current user) read the chat elsewhere, update the unread count in the list
+      if (data.userId === user?.id) {
+        queryClient.invalidateQueries({ queryKey: ['chats'] });
+      }
+    };
+
+    socket.on('message:receive', handleNewMessage);
+    socket.on('chat:read', handleChatRead);
+
+    return () => {
+      socket.off('message:receive', handleNewMessage);
+      socket.off('chat:read', handleChatRead);
+    };
+  }, [socket, queryClient]);
 
   const {
     data: chats,

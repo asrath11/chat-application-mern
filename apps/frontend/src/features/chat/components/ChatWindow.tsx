@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Smile, Paperclip, MoreVertical, Phone, Video } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getChatById } from '@/services/chat.service';
 import { Avatar } from '@/components/common/Avatar';
 import { useSocket } from '@/context/SocketContext';
@@ -10,7 +10,7 @@ import type {
   MessageReceivePayload,
   Message,
 } from '@chat-app/shared-types';
-import { getAllMessages, updateMessage } from '@/services/message.service';
+import { getAllMessages } from '@/services/message.service';
 import { formatDate } from '@/utils/formatters';
 import { useAuth } from '@/context/AuthContext';
 interface ChatWindowProps {
@@ -38,21 +38,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     queryFn: () => getAllMessages(chatId),
   });
 
-  const { mutate: updateMessageStatus } = useMutation({
-    mutationFn: ({
-      messageId,
-      status,
-    }: {
-      messageId: string;
-      status: 'read' | 'delivered' | 'sent';
-    }) => updateMessage(messageId, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
-    },
-    onError: (error: Error) => {
-      console.error('Failed to update message status:', error);
-    },
-  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,24 +51,40 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   useEffect(() => {
     if (!socket) return;
 
-    // Join the chat room
+    // Emit read event when entering the chat
     socket.emit('chat:join', { chatId });
+    socket.emit('chat:read', { chatId });
 
     // Listen for incoming messages
     const handleNewMessage = (data: MessageReceivePayload) => {
       if (data.chatId === chatId) {
         refetchMessages();
+        socket.emit('chat:read', { chatId });
+      }
+    };
+
+    // Listen for read receipts
+    const handleChatRead = (data: { chatId: string; userId: string }) => {
+      if (data.chatId === chatId && data.userId !== user?.id) {
+        queryClient.setQueryData(['messages', chatId], (old: Message[]) => {
+          if (!old) return old;
+          return old.map((msg) =>
+            msg.sender === user?.id ? { ...msg, status: 'read' } : msg
+          );
+        });
       }
     };
 
     socket.on('message:receive', handleNewMessage);
+    socket.on('chat:read', handleChatRead);
 
     // Cleanup on unmount or when chatId changes
     return () => {
       socket.emit('chat:leave', { chatId });
       socket.off('message:receive', handleNewMessage);
+      socket.off('chat:read', handleChatRead);
     };
-  }, [socket, chatId, refetchMessages]);
+  }, [socket, chatId, refetchMessages, user?.id, queryClient]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,10 +93,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
 
     const payload: MessageSendPayload = {
       content: message,
-      chat: chatId,
+      chatId: chatId,
     };
 
-    // Emit via socket (backend should save and broadcast)
     socket?.emit('message:send', payload);
 
     setMessage('');
@@ -163,25 +163,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
                 className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                    isMe
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground'
-                  }`}
+                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${isMe
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground'
+                    }`}
                 >
                   <p className='text-sm wrap-break-word'>{msg.content}</p>
 
                   <div className='flex items-center justify-end gap-1 mt-1'>
                     <span
-                      className={`text-xs ${
-                        isMe ? 'text-muted-foreground' : 'text-primary'
-                      }`}
+                      className={`text-xs ${isMe ? 'text-muted-foreground' : 'text-primary'
+                        }`}
                     >
                       {msg.timestamp
                         ? new Date(msg.timestamp).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
                         : ''}
                     </span>
 

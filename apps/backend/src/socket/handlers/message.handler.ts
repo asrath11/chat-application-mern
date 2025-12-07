@@ -16,7 +16,7 @@ export const registerMessageHandlers = (
   socket.on('message:send', async (data: MessageSendPayload) => {
     const message = await Message.create({
       content: data.content,
-      chat: data.chat,
+      chat: data.chatId,
       sender: socket.userId,
       status: 'delivered',
     });
@@ -28,7 +28,7 @@ export const registerMessageHandlers = (
     const sender = message.sender as unknown as IUser;
 
     // Emit to all users in the chat room with proper structure
-    io.to(data.chat).emit('message:receive', {
+    io.to(data.chatId).emit('message:receive', {
       message: {
         _id: message._id.toString(),
         sender: {
@@ -42,17 +42,29 @@ export const registerMessageHandlers = (
         createdAt: message.createdAt.toISOString(),
         updatedAt: message.updatedAt.toISOString(),
       },
-      chatId: data.chat,
+      chat: data.chatId,
     });
   });
 
-  // Handle message delivery confirmation
-  socket.on('message:delivered', async (data: MessageDeliveredPayload) => {
-    console.log('message delivered', data);
-  });
+  // Handle entire chat read
+  socket.on('chat:read', async (data: { chatId: string }) => {
+    const { chatId } = data;
+    if (!socket.userId) return;
 
-  // Handle message read confirmation
-  socket.on('message:read', async (data: MessageReadPayload) => {
-    console.log('message read', data);
+    // Update status in DB
+    await Message.updateMany(
+      {
+        chat: chatId,
+        sender: { $ne: socket.userId },
+        status: { $ne: 'read' },
+      },
+      { status: 'read' }
+    );
+
+    // Notify room
+    io.to(chatId).emit('chat:read', {
+      chatId,
+      userId: socket.userId,
+    });
   });
 };

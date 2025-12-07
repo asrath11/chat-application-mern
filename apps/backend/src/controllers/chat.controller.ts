@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '@/utils/asyncHandler';
 import Chat from '@/models/chat.model';
 import { IUser } from '@/models/user.model';
-import { IMessage } from '@/models/message.model';
+import Message, { IMessage } from '@/models/message.model';
 
 export const createChat = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.body;
@@ -35,13 +35,19 @@ export const allChats = asyncHandler(async (req: Request, res: Response) => {
     .populate<{ latestMessage: IMessage }>('latestMessage')
     .sort({ updatedAt: -1 });
 
-  const formattedChats = chats
-    .map((chat) => {
+  const formattedChats = await Promise.all(
+    chats.map(async (chat) => {
       const user = chat.participants.find(
         (p) => p._id.toString() !== req.user?.id
       );
 
       if (!user) return null;
+
+      const unreadCount = await Message.countDocuments({
+        chat: chat._id,
+        sender: { $ne: req.user?.id },
+        status: { $ne: 'read' },
+      });
 
       return {
         id: chat._id,
@@ -50,14 +56,16 @@ export const allChats = asyncHandler(async (req: Request, res: Response) => {
         avatar: user.avatar || '',
         lastMessage: chat.latestMessage?.content || '',
         timestamp: chat.updatedAt.toISOString(),
-        unread: 2,
+        unread: unreadCount,
         isOnline: user.isOnline,
         lastSeen: user.lastSeen,
       };
     })
-    .filter(Boolean);
+  );
 
-  res.status(200).json(formattedChats);
+  const validChats = formattedChats.filter(Boolean);
+
+  res.status(200).json(validChats);
 });
 
 export const getChatById = asyncHandler(async (req: Request, res: Response) => {
