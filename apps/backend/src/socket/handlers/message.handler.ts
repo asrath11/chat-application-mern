@@ -1,12 +1,9 @@
 import { Server, Socket } from 'socket.io';
 import { AuthenticatedSocket } from '../index';
 import Message from '@/models/message.model';
+import Chat from '@/models/chat.model';
 import { IUser } from '@/models/user.model';
-import {
-  MessageSendPayload,
-  MessageDeliveredPayload,
-  MessageReadPayload,
-} from '@chat-app/shared-types';
+import { MessageSendPayload } from '@chat-app/shared-types';
 
 export const registerMessageHandlers = (
   io: Server,
@@ -14,11 +11,19 @@ export const registerMessageHandlers = (
 ) => {
   // Handle sending a message
   socket.on('message:send', async (data: MessageSendPayload) => {
+    if (!socket.userId) return;
+
+    // Check if recipient is online and in the chat room
     const message = await Message.create({
       content: data.content,
       chat: data.chatId,
       sender: socket.userId,
-      status: 'delivered',
+      status: 'sent',
+    });
+
+    // Update Chat's latest message
+    await Chat.findByIdAndUpdate(data.chatId, {
+      latestMessage: message._id,
     });
 
     // Populate sender details
@@ -42,7 +47,7 @@ export const registerMessageHandlers = (
         createdAt: message.createdAt.toISOString(),
         updatedAt: message.updatedAt.toISOString(),
       },
-      chat: data.chatId,
+      chatId: data.chatId,
     });
   });
 

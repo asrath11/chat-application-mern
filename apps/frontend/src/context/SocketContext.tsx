@@ -8,6 +8,7 @@ import type {
 import { socketService } from '@/services/socket.service';
 import { authService } from '@/services/auth.service';
 import { useAuth } from '@/context/AuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SocketContextType {
   socket: Socket<ListenEvents, EmitEvents> | null;
@@ -24,6 +25,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -63,6 +65,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     // New message receive handler
     const handleNewMessage = (data: MessageReceivePayload) => {
       console.log('📨 message:receive', data);
+      // Invalidate chat list to update unread counts
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
     // Presence full list

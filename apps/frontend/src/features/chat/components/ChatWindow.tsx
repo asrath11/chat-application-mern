@@ -13,6 +13,7 @@ import type {
 import { getAllMessages } from '@/services/message.service';
 import { formatDate } from '@/utils/formatters';
 import { useAuth } from '@/context/AuthContext';
+
 interface ChatWindowProps {
   chatId: string;
 }
@@ -26,7 +27,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const queryClient = useQueryClient();
 
   const { socket } = useSocket();
-  console.log('user: ', user?.id);
 
   const { data: chat, isLoading: chatLoading } = useQuery({
     queryKey: ['chat', chatId],
@@ -37,7 +37,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     queryKey: ['messages', chatId],
     queryFn: () => getAllMessages(chatId),
   });
-
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,9 +54,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     socket.emit('chat:join', { chatId });
     socket.emit('chat:read', { chatId });
 
+    // Invalidate chat list to reset unread count for this chat
+    queryClient.invalidateQueries({ queryKey: ['chats'] });
+
     // Listen for incoming messages
     const handleNewMessage = (data: MessageReceivePayload) => {
-      if (data.chatId === chatId) {
+      const incomingChatId = data.chatId;
+      if (incomingChatId === chatId) {
+        // If it's my own message coming back, replace the optimistic one
         refetchMessages();
         socket.emit('chat:read', { chatId });
       }
@@ -66,25 +70,33 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     // Listen for read receipts
     const handleChatRead = (data: { chatId: string; userId: string }) => {
       if (data.chatId === chatId && data.userId !== user?.id) {
-        queryClient.setQueryData(['messages', chatId], (old: Message[]) => {
-          if (!old) return old;
-          return old.map((msg) =>
-            msg.sender === user?.id ? { ...msg, status: 'read' } : msg
-          );
+        queryClient.setQueryData(['messages', chatId], (old: Message[] = []) => {
+          return old.map((msg) => {
+            const senderId =
+              typeof msg.sender === 'object' && msg.sender?._id
+                ? msg.sender._id
+                : msg.sender;
+            return senderId === user?.id && msg.status !== 'read'
+              ? { ...msg, status: 'read' }
+              : msg;
+          });
         });
+        refetchMessages();
       }
     };
+
+
 
     socket.on('message:receive', handleNewMessage);
     socket.on('chat:read', handleChatRead);
 
     // Cleanup on unmount or when chatId changes
     return () => {
-      socket.emit('chat:leave', { chatId });
       socket.off('message:receive', handleNewMessage);
       socket.off('chat:read', handleChatRead);
+      socket.emit('chat:leave', { chatId });
     };
-  }, [socket, chatId, refetchMessages, user?.id, queryClient]);
+  }, [socket, chatId, user?.id, queryClient, refetchMessages]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +167,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
           <p className='text-center text-muted-foreground'>No messages yet</p>
         ) : (
           messages.map((msg: Message) => {
-            const isMe = msg.sender === user?.id;
+            const senderId =
+              typeof msg.sender === 'object' && msg.sender._id
+                ? msg.sender._id
+                : msg.sender;
+            const isMe = senderId === user?.id;
 
             return (
               <div

@@ -44,6 +44,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       }
 
       socket.userId = decoded.id;
+      socket.data.userId = decoded.id;
       next();
     } catch (error) {
       next(new Error('Authentication failed'));

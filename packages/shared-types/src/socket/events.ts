@@ -64,13 +64,13 @@ export interface EmitEvents {
   'message:send': (data: MessageSendPayload) => void;
   'message:delivered': (data: MessageDeliveredPayload) => void;
   'message:read': (data: MessageReadPayload) => void;
-  'chat:read': (data: { chatId: string }) => void;
   'typing:start': (data: TypingPayload) => void;
   'typing:stop': (data: TypingPayload) => void;
   'presence:online': () => void;
   'presence:offline': () => void;
   'chat:join': (data: { chatId: string }) => void;
   'chat:leave': (data: { chatId: string }) => void;
+  'chat:read': (data: { chatId: string }) => void;
 }
 
 // Server -> Client Events
