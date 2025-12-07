@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Smile, Paperclip, MoreVertical, Phone, Video } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getChatById } from '@/services/chat.service';
 import { Avatar } from '@/components/common/Avatar';
 import { useSocket } from '@/context/SocketContext';
@@ -10,8 +10,9 @@ import type {
   MessageReceivePayload,
   Message,
 } from '@chat-app/shared-types';
-import { getAllMessages } from '@/services/message.service';
-
+import { getAllMessages, updateMessage } from '@/services/message.service';
+import { formatDate } from '@/utils/formatters';
+import { useAuth } from '@/context/AuthContext';
 interface ChatWindowProps {
   chatId: string;
 }
@@ -21,8 +22,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { onlineUsers } = useSocket();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { socket } = useSocket();
+  console.log('user: ', user?.id);
 
   const { data: chat, isLoading: chatLoading } = useQuery({
     queryKey: ['chat', chatId],
@@ -32,6 +36,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const { data: messages = [], refetch: refetchMessages } = useQuery({
     queryKey: ['messages', chatId],
     queryFn: () => getAllMessages(chatId),
+  });
+
+  const { mutate: updateMessageStatus } = useMutation({
+    mutationFn: ({
+      messageId,
+      status,
+    }: {
+      messageId: string;
+      status: 'read' | 'delivered' | 'sent';
+    }) => updateMessage(messageId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
+    },
+    onError: (error: Error) => {
+      console.error('Failed to update message status:', error);
+    },
   });
 
   const scrollToBottom = () => {
@@ -51,8 +71,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
 
     // Listen for incoming messages
     const handleNewMessage = (data: MessageReceivePayload) => {
-      console.log('📨 Received message in ChatWindow:', data);
-      // Only refetch if the message is for this chat
       if (data.chatId === chatId) {
         refetchMessages();
       }
@@ -109,7 +127,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
               {chat?.name}
             </h2>
             <p className='text-xs'>
-              {chat?.lastSeen ? new Date(chat.lastSeen).toLocaleString() : ''}
+              {onlineUsers.includes(chat?.userId || '')
+                ? 'Online'
+                : chat?.lastSeen
+                  ? formatDate(chat?.lastSeen)
+                  : ''}
             </p>
           </div>
         </div>
@@ -133,7 +155,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
           <p className='text-center text-muted-foreground'>No messages yet</p>
         ) : (
           messages.map((msg: Message) => {
-            const isMe = msg.sender === 'me';
+            const isMe = msg.sender === user?.id;
 
             return (
               <div
@@ -165,11 +187,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
 
                     {isMe && (
                       <span className='text-xs'>
-                        {msg.status === 'read'
-                          ? '✓✓'
-                          : msg.status === 'delivered'
-                            ? '✓✓'
-                            : '✓'}
+                        {msg.status === 'read' ? (
+                          <span className='text-blue-800'>✓✓</span>
+                        ) : msg.status === 'delivered' ? (
+                          <span>✓✓</span>
+                        ) : (
+                          <span>✓</span>
+                        )}
                       </span>
                     )}
                   </div>

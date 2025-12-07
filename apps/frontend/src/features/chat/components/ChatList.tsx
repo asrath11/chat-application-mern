@@ -8,14 +8,15 @@ import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/common/Avatar';
 import { useSocket } from '@/context/SocketContext';
 import { ChatInvite } from '@/features/chat/components/ChatInvite';
+import { Button } from '@/components/ui/button';
+import { formatDate } from '@/utils/formatters';
 
 interface ChatListProps {
   activeChatId?: string;
 }
 
 const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
-  const { user } = useAuth();
-  console.log(user);
+  const { user, logout } = useAuth();
   const { onlineUsers } = useSocket();
   const navigate = useNavigate();
 
@@ -99,9 +100,7 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
                     </h3>
 
                     <span className='text-xs text-muted-foreground shrink-0 ml-2'>
-                      {chat.timestamp
-                        ? new Date(chat.timestamp).toLocaleDateString()
-                        : ''}
+                      {chat.lastSeen ? formatDate(chat.lastSeen) : ''}
                     </span>
                   </div>
 
@@ -137,6 +136,9 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
               {user?.email}
             </p>
           </div>
+          <Button className='cursor-pointer' onClick={logout}>
+            Log Out
+          </Button>
         </div>
       </div>
     </div>

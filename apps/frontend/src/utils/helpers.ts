@@ -7,11 +7,13 @@ export const getInitials = (name: string): string => {
     .slice(0, 2);
 };
 
-export const generateRandomColor = (seed: string): string => {
+export function generateRandomColor(seed: string): string {
   let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+
+  for (const char of seed) {
+    hash = char.charCodeAt(0) + hash * 41;
   }
+
   const hue = hash % 360;
-  return `hsl(${hue}, 70%, 60%)`;
-};
+  return `hsl(${hue}, 50%, 40%)`;
+}

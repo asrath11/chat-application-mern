@@ -20,3 +20,19 @@ export const getAllMessages = async (chatId: string) => {
     throw error;
   }
 };
+
+export const updateMessage = async (
+  messageId: string,
+  status: 'read' | 'delivered' | 'sent'
+) => {
+  try {
+    const response = await axiosInstance.put(`/messages`, {
+      messageId,
+      status,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating message:', error);
+    throw error;
+  }
+};

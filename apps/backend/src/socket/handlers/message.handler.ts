@@ -18,7 +18,7 @@ export const registerMessageHandlers = (
       content: data.content,
       chat: data.chat,
       sender: socket.userId,
-      status: 'sent',
+      status: 'delivered',
     });
 
     // Populate sender details
@@ -42,7 +42,6 @@ export const registerMessageHandlers = (
         createdAt: message.createdAt.toISOString(),
         updatedAt: message.updatedAt.toISOString(),
       },
-      status: 'read',
       chatId: data.chat,
     });
   });

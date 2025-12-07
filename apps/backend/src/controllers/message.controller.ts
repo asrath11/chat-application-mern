@@ -52,15 +52,33 @@ export const getAllMessages = asyncHandler(
 
     const formattedMessages = messages.map((message) => {
       const messageObj = message.toObject();
-
-      const isSender = message.sender.id.toString() === req.user?.id;
-
+      const sender = messageObj.sender as unknown as IUser;
       return {
         ...messageObj,
-        sender: isSender ? 'me' : 'other',
+        sender: sender._id,
       };
     });
 
     res.status(200).json(formattedMessages);
   }
 );
+
+export const updateMessage = asyncHandler(async (req: Request, res: Response) => {
+  const { messageId, status } = req.body;
+
+  if (!messageId) {
+    return res.status(400).json({ message: 'Message ID is required' });
+  }
+
+  const message = await Message.findByIdAndUpdate(
+    messageId,
+    { status },
+    { new: true }
+  );
+
+  if (!message) {
+    return res.status(404).json({ message: 'Message not found' });
+  }
+
+  res.status(200).json(message);
+});
