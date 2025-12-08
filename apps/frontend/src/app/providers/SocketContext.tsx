@@ -6,8 +6,8 @@ import type {
   MessageReceivePayload,
 } from '@chat-app/shared-types';
 import { socketService } from '@/services/socket.service';
-import { authService } from '@/services/auth.service';
-import { useAuth } from '@/context/AuthContext';
+import { authService } from '@/features/auth/services/auth.service';
+import { useAuth } from './AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface SocketContextType {
@@ -18,10 +18,9 @@ interface SocketContextType {
 const SocketContext = createContext<SocketContextType | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const [socket, setSocket] = useState<Socket<
-    ListenEvents,
-    EmitEvents
-  > | null>(null);
+  const [socket, setSocket] = useState<Socket<ListenEvents, EmitEvents> | null>(
+    null
+  );
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const { isAuthenticated } = useAuth();
@@ -86,28 +85,17 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setOnlineUsers((prev) => prev.filter((id) => id !== userId));
     };
 
-    // Typing indicator
-    const handleTyping = (data: {
-      userId: string;
-      chatId: string;
-      isTyping: boolean;
-    }) => {
-      console.log('⌨️ typing', data);
-    };
-
     /* --- register listeners --- */
     socket.on('message:receive', handleNewMessage);
     socket.on('presence:list', handlePresenceList);
     socket.on('presence:online', handlePresenceOnline);
     socket.on('presence:offline', handlePresenceOffline);
-    socket.on('typing', handleTyping);
 
     return () => {
       socket.off('message:receive', handleNewMessage);
       socket.off('presence:list', handlePresenceList);
       socket.off('presence:online', handlePresenceOnline);
       socket.off('presence:offline', handlePresenceOffline);
-      socket.off('typing', handleTyping);
 
       // Don't reset onlineUsers unless socket actually disconnects
     };

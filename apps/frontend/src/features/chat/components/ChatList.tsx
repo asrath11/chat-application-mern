@@ -1,12 +1,12 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/app/providers/AuthContext';
 import { Input } from '@/components/ui/input';
-import { allChats } from '@/services/chat.service';
+import { allChats } from '@/features/chat/services/chat.service';
 import { useNavigate } from 'react-router-dom';
-import { Avatar } from '@/components/common/Avatar';
-import { useSocket } from '@/context/SocketContext';
+import { Avatar } from '@/components/shared/Avatar';
+import { useSocket } from '@/app/providers/SocketContext';
 import { ChatInvite } from '@/features/chat/components/ChatInvite';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/utils/formatters';

@@ -12,11 +12,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2, MessageSquarePlus } from 'lucide-react';
 import { Autocomplete } from '@/components/ui/autocomplete';
-import { Avatar } from '@/components/common/Avatar';
+import { Avatar } from '@/components/shared/Avatar';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { userService, type UserListItem } from '@/services/user.service';
-import { createChat } from '@/services/chat.service';
+import {
+  userService,
+  type UserListItem,
+} from '@/features/auth/services/user.service';
+import { createChat } from '@/features/chat/services/chat.service';
 
 export function ChatInvite() {
   const [open, setOpen] = useState(false);
@@ -29,7 +32,7 @@ export function ChatInvite() {
     queryFn: userService.getAllUsers,
   });
 
-  const userOptions = users.map((user) => user.userName);
+  const userOptions = users.map((user: UserListItem) => user.userName);
 
   const resetForm = () => {
     setSearchValue('');
@@ -68,7 +71,7 @@ export function ChatInvite() {
 
   const handleSelectUser = (userName: string) => {
     setSearchValue(userName);
-    const user = users.find((u) => u.userName === userName) || null;
+    const user = users.find((u: UserListItem) => u.userName === userName) || null;
     setSelectedUser(user);
   };
 
