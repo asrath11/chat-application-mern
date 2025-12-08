@@ -80,7 +80,8 @@ export interface ListenEvents {
   'chat:read': (data: { chatId: string; userId: string }) => void;
   'chat:join': (data: { chatId: string }) => void;
   'chat:leave': (data: { chatId: string }) => void;
-  typing: (data: TypingPayload) => void;
+  'typing:start': (data: TypingPayload) => void;
+  'typing:stop': (data: TypingPayload) => void;
   'presence:list': (userIds: string[]) => void;
   'presence:online': (userId: string) => void;
   'presence:offline': (userId: string) => void;
