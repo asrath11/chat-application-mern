@@ -99,7 +99,9 @@ const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
                     </h3>
 
                     <span className='text-xs text-muted-foreground shrink-0 ml-2'>
-                      {chat.lastSeen ? formatDate(chat.lastSeen) : ''}
+                      {isOnline === false && chat.lastSeen
+                        ? formatDate(chat.lastSeen)
+                        : ''}
                     </span>
                   </div>
 
