@@ -211,25 +211,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
                 className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                    isMe
+                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${isMe
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-secondary text-secondary-foreground'
-                  }`}
+                    }`}
                 >
                   <p className="text-sm wrap-break-word">{msg.content}</p>
 
                   <div className="flex items-center justify-end gap-1 mt-1">
                     <span
-                      className={`text-xs ${
-                        isMe ? 'text-muted-foreground' : 'text-primary'
-                      }`}
+                      className={`text-xs ${isMe ? 'text-muted-foreground' : 'text-primary'
+                        }`}
                     >
                       {msg.timestamp
                         ? new Date(msg.timestamp).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
                         : ''}
                     </span>
 
