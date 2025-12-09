@@ -1,4 +1,4 @@
-import axiosInstance from '@/lib/axios';
+import axiosInstance from '@/services/api/client';
 
 export type UserListItem = {
   id: string;

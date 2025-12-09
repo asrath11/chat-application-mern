@@ -1,4 +1,4 @@
-import axiosInstance from '@/lib/axios';
+import axiosInstance from '@/services/api/client';
 import type { Message } from '@chat-app/shared-types';
 
 export const sendMessage = async (message: Message) => {

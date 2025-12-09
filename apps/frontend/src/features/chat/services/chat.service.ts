@@ -1,4 +1,4 @@
-import axiosInstance from '@/lib/axios';
+import axiosInstance from '@/services/api/client';
 import type { ChatResponse, GetChatByIdResponse } from '@chat-app/shared-types';
 
 export const createChat = async (userId: string): Promise<ChatResponse> => {

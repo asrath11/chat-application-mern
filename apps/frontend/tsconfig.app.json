@@ -10,7 +10,7 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
@@ -23,6 +23,11 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+
+    /* File path + module checks */
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
