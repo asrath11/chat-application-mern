@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getChatById } from '@/features/chat/services/chat.service';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSocket } from '@/app/providers/SocketContext';
 import type {
   MessageSendPayload,
@@ -8,12 +7,12 @@ import type {
   Message,
   TypingPayload,
 } from '@chat-app/shared-types';
-import { getAllMessages } from '@/features/chat/services/message.service';
 import { formatDate } from '@/utils/formatters';
 import { useAuth } from '@/app/providers/AuthContext';
 import { Header } from './ChatWindow/Header';
 import { MessageList } from './ChatWindow/MessageList';
 import { MessageInput } from './ChatWindow/MessageInput';
+import { useChat, useMessages } from '@/features/hooks';
 
 interface ChatWindowProps {
   chatId: string;
@@ -30,16 +29,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
   const queryClient = useQueryClient();
 
   // Fetch chat
-  const { data: chat, isLoading: chatLoading } = useQuery({
-    queryKey: ['chat', chatId],
-    queryFn: () => getChatById(chatId),
-  });
+  const { data: chat, isLoading: chatLoading } = useChat(chatId);
 
   // Fetch messages
-  const { data: messages = [], refetch: refetchMessages } = useQuery({
-    queryKey: ['messages', chatId],
-    queryFn: () => getAllMessages(chatId),
-  });
+  const { data: messages = [], refetch: refetchMessages } = useMessages(chatId);
 
   // Derived values
   const isOnline = onlineUsers.includes(chat?.userId || '');
@@ -152,10 +145,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId }) => {
     );
   }
 
+  const participantIds =
+    chat?.participants?.map((p) => (typeof p === 'string' ? p : p._id || p.id)) ||
+    [];
+
   return (
     <div className='flex flex-col h-screen w-full'>
       <Header
         name={chat?.name || ''}
+        isGroupChat={chat?.isGroupChat || false}
+        participants={participantIds}
         statusText={statusText}
         isOnline={isOnline}
       />

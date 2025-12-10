@@ -17,6 +17,9 @@ const chatSchema = new Schema<IChat>(
       type: String,
       trim: true,
     },
+    chatAvatar: {
+      type: String,
+    },
     isGroupChat: {
       type: Boolean,
       default: false,

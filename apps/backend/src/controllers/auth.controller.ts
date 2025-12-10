@@ -23,10 +23,6 @@ const formatUserResponse = (user: any) => {
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { userName, email, password } = req.body;
 
-  if (!userName || !email || !password) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -55,10 +51,6 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
 
   const user = await User.findOne({ email }).select('+password');
 

@@ -2,9 +2,10 @@ import { User } from './user.types';
 
 export interface IChat {
   chatName?: string;
+  chatAvatar?: string;
   isGroupChat: boolean;
   participants: User[] | string[]; // Populated or IDs
-  latestMessage?: any; // To be refined with Message type
+  latestMessage?: string; // To be refined with Message type
   groupAdmin?: User | string;
   createdAt: Date | string;
   updatedAt: Date | string;
@@ -17,13 +18,24 @@ export interface BaseChat {
   avatar?: string;
   isOnline?: boolean;
   lastSeen: string | Date;
+  participants?: User[] | string[];
   userId?: string;
+  isGroupChat?: boolean;
 }
 
 export interface ChatResponse extends BaseChat {
   unread?: number;
   lastMessage?: string;
   timestamp: string | Date;
+}
+
+export interface GroupChatResponse extends BaseChat {
+  chatName: string;
+  chatAvatar: string;
+  lastMessage: string;
+  timestamp: string | Date;
+  groupAdmin: User;
+  unread: number;
 }
 
 export type GetChatByIdResponse = BaseChat;

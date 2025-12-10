@@ -6,9 +6,6 @@ import type { IUser } from '@/models/user.model';
 
 export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
   const { content, chat } = req.body;
-  if (!content || !chat) {
-    return res.status(400).json({ message: 'Content and chat are required' });
-  }
 
   let message = await Message.create({
     sender: req.user?.id,
@@ -42,10 +39,6 @@ export const getAllMessages = asyncHandler(
   async (req: Request, res: Response) => {
     const { chat } = req.query;
 
-    if (!chat) {
-      return res.status(400).json({ message: 'Chat is required' });
-    }
-
     const messages = await Message.find({ chat })
       .populate('sender', 'name avatar email')
       .sort({ createdAt: 1 });
@@ -65,10 +58,6 @@ export const getAllMessages = asyncHandler(
 
 export const updateMessage = asyncHandler(async (req: Request, res: Response) => {
   const { messageId, status } = req.body;
-
-  if (!messageId) {
-    return res.status(400).json({ message: 'Message ID is required' });
-  }
 
   const message = await Message.findByIdAndUpdate(
     messageId,

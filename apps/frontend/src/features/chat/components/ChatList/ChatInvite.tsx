@@ -13,24 +13,15 @@ import { Button } from '@/components/ui/button';
 import { Loader2, MessageSquarePlus } from 'lucide-react';
 import { Autocomplete } from '@/components/ui/autocomplete';
 import { Avatar } from '@/components/shared/Avatar';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import {
-  userService,
-  type UserListItem,
-} from '@/features/auth/services/user.service';
-import { createChat } from '@/features/chat/services/chat.service';
+import { useUsers, useCreateChat } from '@/features/hooks';
+import type { UserListItem } from '@/features/auth/services/user.service';
 
 export function ChatInvite() {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserListItem | null>(null);
-  const queryClient = useQueryClient();
 
-  const { data: users = [] } = useQuery({
-    queryKey: ['users'],
-    queryFn: userService.getAllUsers,
-  });
+  const { data: users = [] } = useUsers();
 
   const userOptions = users.map((user: UserListItem) => user.userName);
 
@@ -46,20 +37,10 @@ export function ChatInvite() {
     }
   };
 
-  const { mutate: createChatMutation, isPending } = useMutation({
-    mutationFn: createChat,
+  const { mutate: createChatMutation, isPending } = useCreateChat({
     onSuccess: () => {
-      toast.success('Chat created');
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
       resetForm();
       setOpen(false);
-    },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        'Failed to create chat';
-      toast.error(message);
     },
   });
 

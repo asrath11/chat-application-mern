@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 interface AutocompleteProps {
   options: string[];
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
   emptyMessage?: string;

@@ -6,11 +6,7 @@ export type UserListItem = {
   avatar?: string;
 };
 
-class UserService {
-  async getAllUsers() {
-    const response = await axiosInstance.get<UserListItem[]>('/users');
-    return response.data;
-  }
-}
-
-export const userService = new UserService();
+export const getAllUsers = async () => {
+  const response = await axiosInstance.get<UserListItem[]>('/users');
+  return response.data;
+};
