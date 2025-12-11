@@ -6,16 +6,14 @@ import { ChatListHeader } from '@/features/chat/components/ChatList/ChatListHead
 import { ChatListItem } from '@/features/chat/components/ChatList/ChatListItem';
 import { ChatListFooter } from '@/features/chat/components/ChatList/ChatListFooter';
 import { useChats } from '@/features/hooks';
+import { useChatContext } from '@/features/chat/context';
 
-interface ChatListProps {
-  activeChatId?: string;
-}
-
-const ChatList: React.FC<ChatListProps> = ({ activeChatId }) => {
+const ChatList: React.FC = () => {
   const { user, logout } = useAuth();
   const { onlineUsers } = useSocket();
   const navigate = useNavigate();
   const { data: chats, isLoading, error } = useChats();
+  const { activeChatId } = useChatContext();
 
   return (
     <div className='flex flex-col h-screen w-full bg-card'>

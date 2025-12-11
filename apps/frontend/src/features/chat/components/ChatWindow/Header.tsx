@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
-import { Phone, Video, MoreVertical } from 'lucide-react';
+import { Phone, Video } from 'lucide-react';
 import { Avatar } from '@/components/shared/Avatar';
 import { useUsers } from '@/features/hooks';
+import { ChatDropdown } from './GroupChatDropdown';
+import { useChatContext } from '@/features/chat/context';
 
 interface HeaderProps {
   name: string;
@@ -20,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   // Fetch all users
   const { data: users = [] } = useUsers();
+  const { toggleInfoPanel } = useChatContext()
 
   // Memoize participant names to avoid recalculating on every render
   const participantNames = useMemo(() => {
@@ -32,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
     <div className='flex items-center justify-between p-4 bg-card border-b'>
       <div className='flex items-center gap-3'>
         <div className='relative'>
-          <Avatar name={name} />
+          <Avatar name={name} onClick={toggleInfoPanel} />
 
           {isOnline && (
             <div
@@ -71,13 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Video className='w-5 h-5' />
         </button>
-        <button
-          className='p-2 rounded-full hover:bg-accent transition-colors'
-          aria-label='More options'
-          type='button'
-        >
-          <MoreVertical className='w-5 h-5' />
-        </button>
+        <ChatDropdown />
       </div>
     </div>
   );

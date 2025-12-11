@@ -11,9 +11,9 @@ export function generateRandomColor(seed: string): string {
   let hash = 0;
 
   for (const char of seed) {
-    hash = char.charCodeAt(0) + hash * 41;
+    hash = char.charCodeAt(0) + hash * 175;
   }
 
   const hue = hash % 360;
-  return `hsl(${hue}, 50%, 40%)`;
+  return `hsl(${hue}, 50%, 50%)`;
 }
