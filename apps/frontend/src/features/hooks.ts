@@ -7,5 +7,6 @@ export {
   useChat,
   useCreateChat,
   useCreateGroupChat,
+  useAddParticipants,
 } from './chat/hooks/useChats';
 export { useMessages } from './chat/hooks/useMessages';

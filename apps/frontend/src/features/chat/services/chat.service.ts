@@ -35,3 +35,13 @@ export const allGroupChats = async () => {
   const response = await axiosInstance.get('/chats/group');
   return response.data;
 };
+
+export const addParticipants = async (
+  chatId: string,
+  userIds: string[]
+): Promise<{ message: string; chat: any }> => {
+  const response = await axiosInstance.put(`/chats/${chatId}/participants`, {
+    userIds,
+  });
+  return response.data;
+};

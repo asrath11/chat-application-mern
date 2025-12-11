@@ -21,6 +21,7 @@ export interface BaseChat {
   participants?: User[] | string[];
   userId?: string;
   isGroupChat?: boolean;
+  groupAdmin?: User | string;
 }
 
 export interface ChatResponse extends BaseChat {

@@ -122,3 +122,54 @@ export const getChatById = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(200).json(formattedChat);
 });
+
+export const addParticipants = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { userIds } = req.body;
+  const currentUserId = req.user?.id;
+
+  // Find the chat
+  const chat = await Chat.findById(id);
+  if (!chat) {
+    return res.status(404).json({ message: 'Chat not found' });
+  }
+
+  // Check if it's a group chat
+  if (!chat.isGroupChat) {
+    return res.status(400).json({ message: 'Cannot add participants to a direct chat' });
+  }
+
+  // Check if current user is admin
+  if (chat.groupAdmin?.toString() !== currentUserId) {
+    return res.status(403).json({ message: 'Only group admin can add participants' });
+  }
+
+  // Convert userIds to ObjectIds
+  const newParticipantIds = userIds.map((userId: string) => new mongoose.Types.ObjectId(userId));
+
+  // Filter out users who are already participants
+  const existingParticipantIds = chat.participants.map(p => p.toString());
+  const uniqueNewParticipants = newParticipantIds.filter(
+    (newId: mongoose.Types.ObjectId) => !existingParticipantIds.includes(newId.toString())
+  );
+
+  if (uniqueNewParticipants.length === 0) {
+    return res.status(400).json({ message: 'All selected users are already participants' });
+  }
+
+  // Add new participants to the chat
+  chat.participants.push(...uniqueNewParticipants);
+  await chat.save();
+
+  // Return updated chat with populated participants
+  const updatedChat = await Chat.findById(id)
+    .populate<{ participants: IUser[] }>('participants', '-password')
+    .populate<{ latestMessage: IMessage }>('latestMessage');
+
+  const formattedChat = await formatGroupChatResponse(updatedChat!, currentUserId as string);
+
+  res.status(200).json({
+    message: `Successfully added ${uniqueNewParticipants.length} participant(s)`,
+    chat: formattedChat,
+  });
+});
