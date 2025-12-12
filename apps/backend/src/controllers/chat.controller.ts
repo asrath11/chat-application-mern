@@ -81,9 +81,9 @@ export const getAllChats = asyncHandler(async (req: Request, res: Response) => {
     chats.map((chat) => {
       // Use appropriate formatter based on chat type
       if (chat.isGroupChat) {
-        return formatGroupChatResponse(chat as PopulatedChat, req.user?.id as string);
+        return formatGroupChatResponse(chat as unknown as PopulatedChat, req.user?.id as string);
       } else {
-        return formatChatResponse(chat as PopulatedChat, req.user?.id as string);
+        return formatChatResponse(chat as unknown as PopulatedChat, req.user?.id as string);
       }
     })
   );
