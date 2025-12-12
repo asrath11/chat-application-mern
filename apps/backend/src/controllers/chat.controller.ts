@@ -1,10 +1,15 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { asyncHandler } from '@/utils/asyncHandler';
-import Chat from '@/models/chat.model';
+import Chat, { IChat } from '@/models/chat.model';
 import { IUser } from '@/models/user.model';
 import Message, { IMessage } from '@/models/message.model';
 import { formatChatResponse, formatGroupChatResponse } from '@/utils/formatters';
+
+type PopulatedChat = Omit<IChat, 'participants' | 'latestMessage'> & {
+  participants: IUser[];
+  latestMessage?: IMessage;
+};
 
 export const createChat = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.body;
@@ -76,9 +81,9 @@ export const getAllChats = asyncHandler(async (req: Request, res: Response) => {
     chats.map((chat) => {
       // Use appropriate formatter based on chat type
       if (chat.isGroupChat) {
-        return formatGroupChatResponse(chat, req.user?.id as string);
+        return formatGroupChatResponse(chat as PopulatedChat, req.user?.id as string);
       } else {
-        return formatChatResponse(chat, req.user?.id as string);
+        return formatChatResponse(chat as PopulatedChat, req.user?.id as string);
       }
     })
   );
@@ -97,7 +102,7 @@ export const getAllGroupChats = asyncHandler(
 
     const formattedChats = await Promise.all(
       chats.map(async (chat) =>
-        formatGroupChatResponse(chat, req.user?.id as string)
+        formatGroupChatResponse(chat as PopulatedChat, req.user?.id as string)
       )
     );
 
@@ -115,9 +120,9 @@ export const getChatById = asyncHandler(async (req: Request, res: Response) => {
 
   let formattedChat;
   if (chat.isGroupChat) {
-    formattedChat = await formatGroupChatResponse(chat, req.user?.id as string);
+    formattedChat = await formatGroupChatResponse(chat as PopulatedChat, req.user?.id as string);
   } else {
-    formattedChat = await formatChatResponse(chat, req.user?.id as string);
+    formattedChat = await formatChatResponse(chat as PopulatedChat, req.user?.id as string);
   }
 
   res.status(200).json(formattedChat);
@@ -177,7 +182,7 @@ export const addParticipants = asyncHandler(
       .populate<{ latestMessage: IMessage }>('latestMessage');
 
     const formattedChat = await formatGroupChatResponse(
-      updatedChat!,
+      updatedChat! as PopulatedChat,
       currentUserId as string
     );
 
@@ -245,7 +250,7 @@ export const clearChat = asyncHandler(async (req, res) => {
   // 3. Clear chat (Soft delete for user)
   await Message.updateMany(
     { chat: id },
-    { $addToSet: { removedFor: currentUserId } }    
+    { $addToSet: { removedFor: currentUserId } }
   );
 
   // 4. Return updated chat
