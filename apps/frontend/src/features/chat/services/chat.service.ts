@@ -57,3 +57,10 @@ export const deleteParticipants = async (
   );
   return response.data;
 };
+
+export const clearChat = async (
+  chatId: string
+): Promise<{ message: string; chat: any }> => {
+  const response = await axiosInstance.put(`/chats/${chatId}/clear`);
+  return response.data;
+};

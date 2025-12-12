@@ -39,7 +39,10 @@ export const getAllMessages = asyncHandler(
   async (req: Request, res: Response) => {
     const { chat } = req.query;
 
-    const messages = await Message.find({ chat })
+    const messages = await Message.find({
+      chat,
+      removedFor: { $ne: req.user?.id },
+    })
       .populate('sender', 'name avatar email')
       .sort({ createdAt: 1 });
 

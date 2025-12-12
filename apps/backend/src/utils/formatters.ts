@@ -21,14 +21,24 @@ export const formatChatResponse = async (
     chat: chat._id,
     sender: { $ne: currentUserId },
     status: { $ne: 'read' },
+    removedFor: { $ne: currentUserId },
   });
+
+  let lastMessage = chat.latestMessage?.content || '';
+  if (
+    chat.latestMessage?.removedFor?.some(
+      (id) => id.toString() === currentUserId.toString()
+    )
+  ) {
+    lastMessage = '';
+  }
 
   return {
     id: chat._id,
     userId: user._id,
     name: user.userName,
     avatar: user.avatar || '',
-    lastMessage: chat.latestMessage?.content || '',
+    lastMessage,
     timestamp: chat.updatedAt.toISOString(),
     unread: unreadCount,
     isOnline: user.isOnline,
@@ -46,7 +56,17 @@ export const formatGroupChatResponse = async (
     chat: chat._id,
     sender: { $ne: currentUserId },
     status: { $ne: 'read' },
+    removedFor: { $ne: currentUserId },
   });
+
+  let lastMessage = chat.latestMessage?.content || '';
+  if (
+    chat.latestMessage?.removedFor?.some(
+      (id) => id.toString() === currentUserId.toString()
+    )
+  ) {
+    lastMessage = '';
+  }
 
   return {
     id: chat._id,
@@ -59,7 +79,7 @@ export const formatGroupChatResponse = async (
       avatar: p.avatar,
       isOnline: p.isOnline,
     })),
-    lastMessage: chat.latestMessage?.content || '',
+    lastMessage,
     timestamp: chat.updatedAt.toISOString(),
     unread: unreadCount,
     isGroupChat: true,

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { asyncHandler } from '@/utils/asyncHandler';
 import Chat from '@/models/chat.model';
 import { IUser } from '@/models/user.model';
-import { IMessage } from '@/models/message.model';
+import Message, { IMessage } from '@/models/message.model';
 import { formatChatResponse, formatGroupChatResponse } from '@/utils/formatters';
 
 export const createChat = asyncHandler(async (req: Request, res: Response) => {
@@ -230,6 +230,31 @@ export const deleteParticipants = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     message: 'Participants removed successfully',
+    chat: updatedChat,
+  });
+});
+
+export const clearChat = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const currentUserId = req.user?.id;
+
+  // 1. Find chat
+  const chat = await Chat.findById(id);
+  if (!chat) return res.status(404).json({ message: 'Chat not found' });
+
+  // 3. Clear chat (Soft delete for user)
+  await Message.updateMany(
+    { chat: id },
+    { $addToSet: { removedFor: currentUserId } }    
+  );
+
+  // 4. Return updated chat
+  const updatedChat = await Chat.findById(id)
+    .populate('participants', '-password')
+    .populate('latestMessage');
+
+  return res.status(200).json({
+    message: 'Chat cleared successfully',
     chat: updatedChat,
   });
 });

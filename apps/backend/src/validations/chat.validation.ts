@@ -65,8 +65,15 @@ export const deleteParticipantsSchema = z.object({
   }),
 });
 
+export const clearChatSchema = z.object({
+  params: z.object({
+    id: objectIdSchema,
+  }),
+});
+
 export type CreateChatInput = z.infer<typeof createChatSchema>;
 export type CreateGroupChatInput = z.infer<typeof createGroupChatSchema>;
 export type GetChatByIdInput = z.infer<typeof getChatByIdSchema>;
 export type AddParticipantsInput = z.infer<typeof addParticipantsSchema>;
 export type DeleteParticipantsInput = z.infer<typeof deleteParticipantsSchema>;
+export type ClearChatInput = z.infer<typeof clearChatSchema>;

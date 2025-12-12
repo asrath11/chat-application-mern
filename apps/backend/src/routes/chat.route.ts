@@ -7,6 +7,7 @@ import {
   getAllGroupChats,
   addParticipants,
   deleteParticipants,
+  clearChat,
 } from '../controllers/chat.controller';
 import { protect } from '@/middlewares/protect';
 import { validate } from '@/middlewares/validate.middleware';
@@ -16,6 +17,7 @@ import {
   getChatByIdSchema,
   addParticipantsSchema,
   deleteParticipantsSchema,
+  clearChatSchema,
 } from '@/validations/chat.validation';
 
 const router = express.Router();
@@ -33,5 +35,6 @@ router
 router
   .route('/:id/participants/delete')
   .put(validate(deleteParticipantsSchema), deleteParticipants);
+router.route('/:id/clear').put(validate(clearChatSchema), clearChat);
 
 export default router;

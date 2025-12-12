@@ -6,6 +6,7 @@ export interface IMessage
     Omit<ISharedMessage, 'sender' | 'chat'> {
   sender: mongoose.Types.ObjectId;
   chat: mongoose.Types.ObjectId;
+  removedFor: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,6 +21,12 @@ const messageSchema = new Schema<IMessage>(
       enum: ['sent', 'delivered', 'read'],
       default: 'sent',
     },
+    removedFor: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,

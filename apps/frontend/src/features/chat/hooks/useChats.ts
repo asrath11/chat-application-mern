@@ -6,6 +6,7 @@ import {
   createGroupChat,
   addParticipants,
   deleteParticipants,
+  clearChat,
 } from '@/features/chat/services/chat.service';
 import { toast } from 'sonner';
 
@@ -130,6 +131,33 @@ export const useDeleteParticipants = (options?: {
         error?.response?.data?.message ||
         error?.message ||
         'Failed to delete participants';
+      toast.error(message);
+      options?.onError?.(error);
+    },
+  });
+};
+
+export const useClearChat = (options?: {
+  onSuccess?: () => void;
+  onError?: (error: any) => void;
+}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ chatId }: { chatId: string }) => clearChat(chatId),
+    onSuccess: (data, variables) => {
+      toast.success(data.message);
+      // Invalidate both the specific chat ,the chats list and the messages list
+      queryClient.invalidateQueries({ queryKey: ['chat', variables.chatId] });
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', variables.chatId] });
+      options?.onSuccess?.();
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to clear chat';
       toast.error(message);
       options?.onError?.(error);
     },
