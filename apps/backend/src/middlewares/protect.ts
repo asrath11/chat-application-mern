@@ -14,14 +14,17 @@ export const protect = asyncHandler(
       return res.status(401).json({ message: 'Access token missing' });
     }
 
-    const decoded = verifyAccessToken(accessToken);
+    try {
+      const decoded = verifyAccessToken(accessToken);
 
-    if (!decoded || typeof decoded === 'string' || !('id' in decoded)) {
-      return res.status(403).json({ message: 'Invalid access token' });
+      if (!decoded || typeof decoded === 'string' || !('id' in decoded)) {
+        return res.status(401).json({ message: 'Invalid access token' });
+      }
+
+      req.user = decoded as AuthenticatedUser;
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: 'Access token expired or invalid' });
     }
-
-    req.user = decoded as AuthenticatedUser;
-
-    next();
   }
 );

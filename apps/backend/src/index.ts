@@ -54,3 +54,5 @@ httpServer.listen(config.port, () => {
   console.log(`🔌 Socket.IO server ready`);
   console.log(`📝 Environment: ${config.nodeEnv}`);
 });
+
+// Force restart

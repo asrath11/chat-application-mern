@@ -129,7 +129,6 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-
   return res.status(200).json({
     user: formatUserResponse(user),
   });
@@ -147,7 +146,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         user.refreshToken = undefined;
         await user.save({ validateBeforeSave: false });
       }
-    } catch (err) { }
+    } catch (err) {}
   }
 
   res.clearCookie('accessToken');
@@ -173,7 +172,7 @@ export const getWebSocketToken = asyncHandler(
     res.json({
       token: wsToken,
       expiresIn: '15m',
-      message: 'WebSocket token generated successfully'
+      message: 'WebSocket token generated successfully',
     });
   }
 );
