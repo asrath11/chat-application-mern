@@ -22,6 +22,8 @@ export const generateRefreshToken = (userId: string): string => {
   );
 };
 
+
+
 export const verifyAccessToken = (token: string) => {
   return jwt.verify(token, ACCESS_TOKEN_SECRET);
 };

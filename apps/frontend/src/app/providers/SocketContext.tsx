@@ -36,8 +36,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const start = async () => {
       try {
-        const { accessToken } = await authService.getMe();
-        const s = socketService.connect(accessToken);
+        const { token } = await authService.getWsToken();
+        const s = socketService.connect(token);
 
         if (active) {
           setSocket(s);

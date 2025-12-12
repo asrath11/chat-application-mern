@@ -40,6 +40,11 @@ class AuthService {
     );
     return response.data;
   }
+
+  async getWsToken(): Promise<{ token: string }> {
+    const response = await axiosInstance.get<{ token: string }>('/auth/ws-token');
+    return response.data;
+  }
 }
 
 export const authService = new AuthService();

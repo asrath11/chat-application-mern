@@ -65,7 +65,7 @@ export const formatGroupChatResponse = async (
       (id) => id.toString() === currentUserId.toString()
     )
   ) {
-    lastMessage = '';
+    lastMessage = ''; 
   }
 
   return {

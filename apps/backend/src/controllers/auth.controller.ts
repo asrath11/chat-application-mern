@@ -41,8 +41,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   await user.save({ validateBeforeSave: false });
 
   // Set cookies
-  generateCookie(res, accessToken, 'accessToken');
-  generateCookie(res, refreshToken, 'refreshToken');
+  generateCookie(res, accessToken, 'accessToken', 15 * 60 * 1000); // 15 minutes
+  generateCookie(res, refreshToken, 'refreshToken', 7 * 24 * 60 * 60 * 1000); // 7 days
 
   return res.status(201).json({
     user: formatUserResponse(user),
@@ -72,8 +72,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   await user.save({ validateBeforeSave: false });
 
   // Set cookies
-  generateCookie(res, accessToken, 'accessToken');
-  generateCookie(res, refreshToken, 'refreshToken');
+  generateCookie(res, accessToken, 'accessToken', 15 * 60 * 1000); // 15 minutes
+  generateCookie(res, refreshToken, 'refreshToken', 7 * 24 * 60 * 60 * 1000); // 7 days
 
   return res.status(200).json({
     user: formatUserResponse(user),
@@ -103,17 +103,17 @@ export const refreshAccessToken = asyncHandler(
         .json({ message: 'Refresh token expired or invalid' });
     }
 
-    // Generate new tokens (rotation)
+    // Generate new tokens
     const newAccessToken = generateAccessToken(user._id.toString());
     const newRefreshToken = generateRefreshToken(user._id.toString());
 
-    // Save rotated refresh token
+    // Update refresh token in database
     user.refreshToken = newRefreshToken;
     await user.save({ validateBeforeSave: false });
 
-    // Reset cookies
-    generateCookie(res, newAccessToken, 'accessToken');
-    generateCookie(res, newRefreshToken, 'refreshToken');
+    // Set new cookies
+    generateCookie(res, newAccessToken, 'accessToken', 15 * 60 * 1000); // 15 minutes
+    generateCookie(res, newRefreshToken, 'refreshToken', 7 * 24 * 60 * 60 * 1000); // 7 days
 
     return res.status(200).json({
       message: 'Token refreshed successfully',
@@ -129,12 +129,9 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  // Generate a fresh access token
-  const accessToken = generateAccessToken(user._id.toString());
 
   return res.status(200).json({
     user: formatUserResponse(user),
-    accessToken,
   });
 });
 
@@ -150,7 +147,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         user.refreshToken = undefined;
         await user.save({ validateBeforeSave: false });
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   res.clearCookie('accessToken');
@@ -158,3 +155,25 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
 
   return res.status(200).json({ message: 'Logged out successfully' });
 });
+
+/**
+ * Generate WebSocket token for authenticated user
+ */
+export const getWebSocketToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    // Generate a short-lived WebSocket token (reusing access token generation)
+    const wsToken = generateAccessToken(userId);
+
+    res.json({
+      token: wsToken,
+      expiresIn: '15m',
+      message: 'WebSocket token generated successfully'
+    });
+  }
+);

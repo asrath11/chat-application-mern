@@ -5,6 +5,7 @@ import {
   logout,
   refreshAccessToken,
   getMe,
+  getWebSocketToken,
 } from '../controllers/auth.controller';
 import { protect } from '@/middlewares/protect';
 import { validate } from '@/middlewares/validate.middleware';
@@ -17,5 +18,6 @@ router.post('/login', validate(loginSchema), login);
 router.post('/logout', logout);
 router.post('/refresh', refreshAccessToken);
 router.get('/me', protect, getMe);
+router.get('/ws-token', protect, getWebSocketToken);
 
 export default router;
