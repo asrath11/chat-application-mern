@@ -5,6 +5,7 @@ import {
   createChat,
   createGroupChat,
   addParticipants,
+  deleteParticipants,
 } from '@/features/chat/services/chat.service';
 import { toast } from 'sonner';
 
@@ -103,6 +104,32 @@ export const useAddParticipants = (options?: {
         error?.response?.data?.message ||
         error?.message ||
         'Failed to add participants';
+      toast.error(message);
+      options?.onError?.(error);
+    },
+  });
+};
+export const useDeleteParticipants = (options?: {
+  onSuccess?: () => void;
+  onError?: (error: any) => void;
+}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ chatId, userIds }: { chatId: string; userIds: string[] }) =>
+      deleteParticipants(chatId, userIds),
+    onSuccess: (data, variables) => {
+      toast.success(data.message);
+      // Invalidate both the specific chat and the chats list
+      queryClient.invalidateQueries({ queryKey: ['chat', variables.chatId] });
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      options?.onSuccess?.();
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to delete participants';
       toast.error(message);
       options?.onError?.(error);
     },

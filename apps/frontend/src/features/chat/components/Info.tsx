@@ -2,11 +2,13 @@ import { X } from 'lucide-react';
 import { useChat } from '@/features/hooks';
 import { useChatContext } from '@/features/chat/context';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/shared/Avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { User } from '@chat-app/shared-types';
 import { useAuth } from '@/app/providers/AuthContext';
 import { AddParticipantsModal } from './AddParticipantsModal';
+import { DeleteParticipantsModal } from './DeleteParticipantsModal';
 
 interface InfoProps {
   className?: string;
@@ -69,48 +71,55 @@ export default function ChatInfo({ className }: InfoProps) {
                 Participants ({chat?.participants?.length})
               </h4>
 
-              <div className='space-y-2 max-h-48 overflow-y-auto pr-1'>
-                {chat?.participants?.length === 0 && (
-                  <p className='text-xs text-muted-foreground'>
-                    No participants found.
-                  </p>
-                )}
+              {/* Proper Shadcn ScrollArea */}
+              <ScrollArea className='h-50 w-full rounded-md border'>
+                <div className='space-y-2 p-3'>
+                  {chat?.participants?.length === 0 && (
+                    <p className='text-xs text-muted-foreground text-center py-4'>
+                      No participants found.
+                    </p>
+                  )}
 
-                {chat?.participants?.map((participant) => {
-                  const isObject =
-                    typeof participant === 'object' && participant !== null;
+                  {chat?.participants?.map((participant) => {
+                    const isObject =
+                      typeof participant === 'object' && participant !== null;
 
-                  const p = isObject
-                    ? (participant as User)
-                    : ({ id: participant, name: 'Unknown User' } as User);
+                    const p = isObject
+                      ? (participant as User)
+                      : ({ id: participant, name: 'Unknown User' } as User);
 
-                  const participantId = p.id;
-                  const isAdmin = chat?.groupAdmin === participantId;
+                    const participantId = p.id;
+                    const isAdmin = chat?.groupAdmin === participantId;
 
-                  return (
-                    <div
-                      key={participantId}
-                      className='flex items-center gap-3 p-2 rounded-md hover:bg-accent transition'
-                    >
-                      <Avatar name={p.name} size='sm' />
-                      <span className='text-sm'>{p.name}</span>
+                    return (
+                      <div
+                        key={participantId}
+                        className='flex items-center gap-3 p-2 rounded-md hover:bg-accent transition'
+                      >
+                        <Avatar name={p.name} size='sm' />
+                        <span className='text-sm'>{p.name}</span>
 
-                      {isAdmin && (
-                        <span className='text-xs px-1.5 py-0.5 rounded bg-accent text-muted-foreground'>
-                          Admin
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                        {isAdmin && (
+                          <span className='text-xs px-1.5 py-0.5 rounded bg-accent text-muted-foreground'>
+                            Admin
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
 
               {/* Admin Actions */}
               {isCurrentUserAdmin && (
-                <div className='mt-4'>
+                <div className='mt-4 space-y-2'>
                   <AddParticipantsModal
                     chatId={activeChatId || ''}
                     existingParticipants={chat?.participants || []}
+                  />
+                  <DeleteParticipantsModal
+                    chatId={activeChatId || ''}
+                    participants={chat?.participants || []}
                   />
                 </div>
               )}

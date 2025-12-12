@@ -51,8 +51,22 @@ export const addParticipantsSchema = z.object({
       .max(20, 'Cannot add more than 20 participants at once'),
   }),
 });
+export const deleteParticipantsSchema = z.object({
+  params: z.object({
+    id: objectIdSchema,
+  }),
+  body: z.object({
+    userIds: z
+      .array(objectIdSchema, {
+        message: 'User IDs array is required',
+      })
+      .min(1, 'At least one user ID is required')
+      .max(20, 'Cannot add more than 20 participants at once'),
+  }),
+});
 
 export type CreateChatInput = z.infer<typeof createChatSchema>;
 export type CreateGroupChatInput = z.infer<typeof createGroupChatSchema>;
 export type GetChatByIdInput = z.infer<typeof getChatByIdSchema>;
 export type AddParticipantsInput = z.infer<typeof addParticipantsSchema>;
+export type DeleteParticipantsInput = z.infer<typeof deleteParticipantsSchema>;

@@ -45,3 +45,15 @@ export const addParticipants = async (
   });
   return response.data;
 };
+export const deleteParticipants = async (
+  chatId: string,
+  userIds: string[]
+): Promise<{ message: string; chat: any }> => {
+  const response = await axiosInstance.put(
+    `/chats/${chatId}/participants/delete`,
+    {
+      userIds,
+    }
+  );
+  return response.data;
+};

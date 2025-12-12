@@ -13,18 +13,18 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import type { User } from '@chat-app/shared-types';
 import { UserSelector } from './UserSelector';
-import { useAddParticipants } from '@/features/hooks';
 import { useParticipantsModal } from '../hooks/useParticipantsModal';
+import { useDeleteParticipants } from '../hooks/useChats';
 
-interface AddParticipantsModalProps {
+interface DeleteParticipantsModalProps {
   chatId: string;
-  existingParticipants: (User | string)[];
+  participants: (User | string)[];
 }
 
-export function AddParticipantsModal({
+export function DeleteParticipantsModal({
   chatId,
-  existingParticipants,
-}: AddParticipantsModalProps) {
+  participants,
+}: DeleteParticipantsModalProps) {
   const {
     open,
     selectedUsers,
@@ -34,20 +34,22 @@ export function AddParticipantsModal({
     closeModal,
   } = useParticipantsModal();
 
-  const { mutate: addParticipantsMutation, isPending } = useAddParticipants({
-    onSuccess: () => {
-      closeModal();
-    },
-  });
+  const { mutate: deleteParticipantsMutation, isPending } = useDeleteParticipants(
+    {
+      onSuccess: () => {
+        closeModal();
+      },
+    }
+  );
 
-  const existingParticipantIds = useMemo(() => {
-    return existingParticipants.map((participant) =>
+  const participantIds = useMemo(() => {
+    return participants.map((participant) =>
       typeof participant === 'string' ? participant : participant.id
     );
-  }, [existingParticipants]);
+  }, [participants]);
 
   const onSubmit = (userIds: string[]) => {
-    addParticipantsMutation({
+    deleteParticipantsMutation({
       chatId,
       userIds,
     });
@@ -56,15 +58,17 @@ export function AddParticipantsModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className='w-full'>Add Participants</Button>
+        <Button className='w-full' variant='destructive'>
+          Delete Participants
+        </Button>
       </DialogTrigger>
 
       <DialogContent className='sm:max-w-[425px]'>
         <form onSubmit={(e) => handleSubmit(e, onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Add Participants</DialogTitle>
+            <DialogTitle>Delete Participants</DialogTitle>
             <DialogDescription>
-              Select users to add to this group chat
+              Select users to remove from this group chat
             </DialogDescription>
           </DialogHeader>
 
@@ -72,8 +76,8 @@ export function AddParticipantsModal({
             <UserSelector
               selectedUsers={selectedUsers}
               onSelectionChange={setSelectedUsers}
-              excludeUserIds={existingParticipantIds}
-              searchPlaceholder='Search users to add'
+              includeUserIds={participantIds}
+              searchPlaceholder='Search participants to remove'
               label='Search Users'
             />
           </div>
@@ -87,15 +91,16 @@ export function AddParticipantsModal({
 
             <Button
               type='submit'
-              disabled={isPending || selectedUsers.length === 0}
+              disabled={selectedUsers.length === 0}
+              variant='destructive'
             >
               {isPending ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Adding...
+                  Removing...
                 </>
               ) : (
-                `Add ${selectedUsers.length || ''} Participant${selectedUsers.length !== 1 ? 's' : ''}`
+                `Remove ${selectedUsers.length || ''} Participant${selectedUsers.length !== 1 ? 's' : ''}`
               )}
             </Button>
           </DialogFooter>

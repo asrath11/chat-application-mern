@@ -8,6 +8,7 @@ interface UserSelectorProps {
   selectedUsers: string[];
   onSelectionChange: (users: string[]) => void;
   excludeUserIds?: string[];
+  includeUserIds?: string[];
   searchPlaceholder?: string;
   label?: string;
 }
@@ -16,6 +17,7 @@ export function UserSelector({
   selectedUsers,
   onSelectionChange,
   excludeUserIds = [],
+  includeUserIds,
   searchPlaceholder = 'Search users',
   label = 'Add Members',
 }: UserSelectorProps) {
@@ -25,16 +27,23 @@ export function UserSelector({
   // Fetch all users
   const { data: users = [] } = useUsers();
 
-  // Filter users based on exclusions and search
+  // Filter users based on exclusions, inclusions, and search
   const filteredOptions = useMemo(() => {
     return users.filter((user) => {
+      // If includeUserIds is provided, only show those users
+      if (includeUserIds && includeUserIds.length > 0) {
+        const isIncluded = includeUserIds.includes(user.id);
+        if (!isIncluded) return false;
+      }
+
+      // Otherwise, exclude users in excludeUserIds
       const isNotExcluded = !excludeUserIds.includes(user.id);
       const matchesSearch = user.userName
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
       return isNotExcluded && matchesSearch;
     });
-  }, [users, excludeUserIds, searchQuery]);
+  }, [users, excludeUserIds, includeUserIds, searchQuery]);
 
   // Reset highlighted index when search changes
   useEffect(() => {
