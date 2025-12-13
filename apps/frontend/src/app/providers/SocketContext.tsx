@@ -1,10 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import type {
-  ListenEvents,
-  EmitEvents,
-  MessageReceivePayload,
-} from '@chat-app/shared-types';
+import type { ListenEvents, EmitEvents } from '@chat-app/shared-types';
 import { socketService } from '@/services/socket.service';
 import { getWsToken } from '@/features/auth/services/auth.service';
 import { useAuth } from './AuthContext';
