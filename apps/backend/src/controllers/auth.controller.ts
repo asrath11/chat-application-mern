@@ -149,8 +149,15 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     } catch (err) {}
   }
 
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
+  const cookieOptions: any = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    partitioned: process.env.NODE_ENV === 'production',
+  };
+
+  res.clearCookie('accessToken', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
 
   return res.status(200).json({ message: 'Logged out successfully' });
 });

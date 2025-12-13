@@ -11,5 +11,6 @@ export const generateCookie = (
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge,
+    path: '/',
   });
 };
