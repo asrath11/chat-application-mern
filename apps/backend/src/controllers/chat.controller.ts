@@ -81,9 +81,15 @@ export const getAllChats = asyncHandler(async (req: Request, res: Response) => {
     chats.map((chat) => {
       // Use appropriate formatter based on chat type
       if (chat.isGroupChat) {
-        return formatGroupChatResponse(chat as unknown as PopulatedChat, req.user?.id as string);
+        return formatGroupChatResponse(
+          chat as unknown as PopulatedChat,
+          req.user?.id as string
+        );
       } else {
-        return formatChatResponse(chat as unknown as PopulatedChat, req.user?.id as string);
+        return formatChatResponse(
+          chat as unknown as PopulatedChat,
+          req.user?.id as string
+        );
       }
     })
   );
@@ -102,7 +108,10 @@ export const getAllGroupChats = asyncHandler(
 
     const formattedChats = await Promise.all(
       chats.map(async (chat) =>
-        formatGroupChatResponse(chat as PopulatedChat, req.user?.id as string)
+        formatGroupChatResponse(
+          chat as unknown as PopulatedChat,
+          req.user?.id as string
+        )
       )
     );
 
@@ -120,9 +129,15 @@ export const getChatById = asyncHandler(async (req: Request, res: Response) => {
 
   let formattedChat;
   if (chat.isGroupChat) {
-    formattedChat = await formatGroupChatResponse(chat as PopulatedChat, req.user?.id as string);
+    formattedChat = await formatGroupChatResponse(
+      chat as unknown as PopulatedChat,
+      req.user?.id as string
+    );
   } else {
-    formattedChat = await formatChatResponse(chat as PopulatedChat, req.user?.id as string);
+    formattedChat = await formatChatResponse(
+      chat as unknown as PopulatedChat,
+      req.user?.id as string
+    );
   }
 
   res.status(200).json(formattedChat);
@@ -182,7 +197,7 @@ export const addParticipants = asyncHandler(
       .populate<{ latestMessage: IMessage }>('latestMessage');
 
     const formattedChat = await formatGroupChatResponse(
-      updatedChat! as PopulatedChat,
+      updatedChat! as unknown as PopulatedChat,
       currentUserId as string
     );
 
