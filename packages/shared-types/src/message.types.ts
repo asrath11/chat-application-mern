@@ -1,5 +1,5 @@
-import { User } from './user.types';
-import { IChat } from './chat.types';
+import type { User } from './user.types';
+import type { IChat } from './chat.types';
 
 export interface IMessage {
   sender: User | string;
@@ -16,12 +16,12 @@ export interface Message {
   content: string;
   chat: string;
   sender?:
-    | string
-    | {
-        _id: string;
-        name: string;
-        avatar?: string;
-      };
+  | string
+  | {
+    _id: string;
+    name: string;
+    avatar?: string;
+  };
   status: 'delivered' | 'read' | 'sent';
   timestamp: string | Date;
   createdAt?: string | Date;
