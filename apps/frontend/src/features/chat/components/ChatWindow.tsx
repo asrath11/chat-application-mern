@@ -14,7 +14,7 @@ import { MessageList } from './ChatWindow/MessageList';
 import { MessageInput } from './ChatWindow/MessageInput';
 import { useChat, useMessages } from '@/features/hooks';
 import { useChatContext } from '@/features/chat/context';
-import { Loading } from '@/components/shared/Loading';
+import { ChatWindowSkeleton } from '@/components/shared/LoadingSkeletons';
 
 interface ChatWindowProps {
   className: string;
@@ -153,11 +153,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
   };
 
   if (chatLoading) {
-    return (
-      <div className='flex items-center justify-center h-full bg-background'>
-        <Loading size='lg' text='Loading chat...' />
-      </div>
-    );
+    return <ChatWindowSkeleton className={className} />;
   }
 
   const participantIds =

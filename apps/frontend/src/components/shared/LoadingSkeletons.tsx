@@ -128,3 +128,33 @@ export const CardSkeleton = ({ className }: { className?: string }) => {
     </div>
   );
 };
+
+export const ChatWindowSkeleton = ({ className }: { className?: string }) => {
+  return (
+    <div className={cn('flex flex-col h-full bg-background', className)}>
+      {/* Header Skeleton */}
+      <div className='h-16 border-b flex items-center px-6 gap-3 shrink-0'>
+        <Skeleton className='h-10 w-10 rounded-full' />
+        <div className='flex flex-col gap-1.5'>
+          <Skeleton className='h-4 w-32' />
+          <Skeleton className='h-3 w-20' />
+        </div>
+        <div className='ml-auto'>
+          <Skeleton className='h-8 w-8 rounded-full' />
+        </div>
+      </div>
+
+      {/* Messages Skeleton */}
+      <div className='flex-1 p-4'>
+        <MessageListSkeleton />
+      </div>
+
+      {/* Input Skeleton */}
+      <div className='h-20 border-t p-4 flex items-center gap-2 shrink-0'>
+        <Skeleton className='h-10 w-10 rounded-full' />
+        <Skeleton className='h-10 flex-1 rounded-md' />
+        <Skeleton className='h-10 w-10 rounded-full' />
+      </div>
+    </div>
+  );
+};
