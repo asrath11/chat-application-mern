@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "dependencies": {
     "@base-ui-components/react": "1.0.0-rc.0",
     "@chat-app/shared-types": "workspace:*",

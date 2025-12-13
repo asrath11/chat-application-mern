@@ -7,6 +7,9 @@
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "build": "tsc -b"
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
