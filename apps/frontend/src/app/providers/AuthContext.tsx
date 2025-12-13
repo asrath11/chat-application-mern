@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { authService } from '@/features/auth/services/auth.service';
+import {
+  getMe,
+  login as loginService,
+  logout as logoutService,
+  register as registerService,
+} from '@/features/auth/services/auth.service';
 import type {
   LoginCredentials,
   RegisterCredentials,
@@ -27,8 +32,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      const { user } = await authService.getMe();
-      setUser(user);
+      const response = await getMe();
+      setUser(response.user);
     } catch {
       setUser(null);
     } finally {
@@ -41,17 +46,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
-    const { user } = await authService.login(credentials);
-    setUser(user);
+    const response = await loginService(credentials);
+    setUser(response.user);
   };
 
   const register = async (credentials: RegisterCredentials) => {
-    const { user } = await authService.register(credentials);
-    setUser(user);
+    const response = await registerService(credentials);
+    setUser(response.user);
   };
 
   const logout = async () => {
-    await authService.logout();
+    await logoutService();
     setUser(null);
   };
 

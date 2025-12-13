@@ -6,7 +6,7 @@ import type {
   MessageReceivePayload,
 } from '@chat-app/shared-types';
 import { socketService } from '@/services/socket.service';
-import { authService } from '@/features/auth/services/auth.service';
+import { getWsToken } from '@/features/auth/services/auth.service';
 import { useAuth } from './AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -36,7 +36,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const start = async () => {
       try {
-        const { token } = await authService.getWsToken();
+        const { token } = await getWsToken();
         const s = socketService.connect(token);
 
         if (active) {

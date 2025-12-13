@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import { getWebSocketToken } from '@/utils/auth';
+import { getWsToken } from '@/features/auth/services/auth.service';
 
 class WebSocketService {
     private socket: Socket | null = null;
@@ -10,7 +10,7 @@ class WebSocketService {
     async connect(): Promise<Socket> {
         try {
             // Get fresh WebSocket token from backend
-            const token = await getWebSocketToken();
+            const { token } = await getWsToken();
 
             // Connect to WebSocket with token
             this.socket = io('http://localhost:3000', {
@@ -72,7 +72,7 @@ class WebSocketService {
 
         try {
             // Get a fresh WebSocket token
-            const newToken = await getWebSocketToken();
+            const { token: newToken } = await getWsToken();
 
             if (newToken && this.socket) {
                 this.socket.auth = { token: newToken };

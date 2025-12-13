@@ -5,46 +5,42 @@ import type {
   AuthResponse,
 } from '@chat-app/shared-types';
 
-class AuthService {
-  async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const response = await axiosInstance.post<AuthResponse>(
-      '/auth/register',
-      credentials
-    );
-    return response.data;
-  }
+export const register = async (credentials: RegisterCredentials): Promise<AuthResponse> => {
+  const response = await axiosInstance.post<AuthResponse>(
+    '/auth/register',
+    credentials
+  );
+  return response.data;
+};
 
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await axiosInstance.post<AuthResponse>(
-      '/auth/login',
-      credentials
-    );
-    return response.data;
-  }
+export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+  const response = await axiosInstance.post<AuthResponse>(
+    '/auth/login',
+    credentials
+  );
+  return response.data;
+};
 
-  async logout(): Promise<{ message: string }> {
-    const response = await axiosInstance.post<{ message: string }>(
-      '/auth/logout'
-    );
-    return response.data;
-  }
+export const logout = async (): Promise<{ message: string }> => {
+  const response = await axiosInstance.post<{ message: string }>(
+    '/auth/logout'
+  );
+  return response.data;
+};
 
-  async getMe(): Promise<AuthResponse> {
-    const response = await axiosInstance.get<AuthResponse>('/auth/me');
-    return response.data;
-  }
+export const getMe = async (): Promise<AuthResponse> => {
+  const response = await axiosInstance.get<AuthResponse>('/auth/me');
+  return response.data;
+};
 
-  async refreshToken(): Promise<{ accessToken: string }> {
-    const response = await axiosInstance.post<{ accessToken: string }>(
-      '/auth/refresh'
-    );
-    return response.data;
-  }
+export const refreshToken = async (): Promise<{ accessToken: string }> => {
+  const response = await axiosInstance.post<{ accessToken: string }>(
+    '/auth/refresh'
+  );
+  return response.data;
+};
 
-  async getWsToken(): Promise<{ token: string }> {
-    const response = await axiosInstance.get<{ token: string }>('/auth/ws-token');
-    return response.data;
-  }
-}
-
-export const authService = new AuthService();
+export const getWsToken = async (): Promise<{ token: string }> => {
+  const response = await axiosInstance.get<{ token: string }>('/auth/ws-token');
+  return response.data;
+};
