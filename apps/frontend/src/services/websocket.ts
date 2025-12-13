@@ -34,12 +34,10 @@ class WebSocketService {
         if (!this.socket) return;
 
         this.socket.on('connect', () => {
-            console.log('✅ WebSocket connected');
             this.reconnectAttempts = 0;
         });
 
         this.socket.on('disconnect', (reason) => {
-            console.log('❌ WebSocket disconnected:', reason);
 
             // Auto-reconnect for certain disconnect reasons
             if (reason === 'io server disconnect') {

@@ -9,7 +9,7 @@ class SocketService {
   private token: string | undefined;
   private listenersInitialized = false;
 
-  constructor() {}
+  constructor() { }
 
   connect(token: string | undefined) {
     // Validate environment variable
@@ -20,7 +20,6 @@ class SocketService {
 
     // Handle token changes - if token changed while connected, reconnect
     if (this.socket?.connected && this.token !== token) {
-      console.log('🔄 Token changed, reconnecting...');
       this.token = token;
       this.socket.auth = { token };
       this.socket.disconnect().connect();
@@ -61,18 +60,18 @@ class SocketService {
   private setupEventListeners() {
     if (!this.socket) return;
 
-    // These are internal listeners for logging/debugging
-    this.socket.on('connect', () => {
-      console.log('🟢 Socket Connected:', this.socket?.id);
-    });
+    // // These are internal listeners for logging/debugging
+    // this.socket.on('connect', () => {
+    //   console.log('🟢 Socket Connected:', this.socket?.id);
+    // });
 
-    this.socket.on('disconnect', (reason) => {
-      console.log('🔴 Socket Disconnected:', reason);
-    });
+    // this.socket.on('disconnect', (reason) => {
+    //   console.log('🔴 Socket Disconnected:', reason);
+    // });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('⚠️ Connection Error:', error.message);
-    });
+    // this.socket.on('connect_error', (error) => {
+    //   console.error('⚠️ Connection Error:', error.message);
+    // });
   }
 
   emit(event: string, data?: any): boolean {
@@ -98,7 +97,6 @@ class SocketService {
     this.socket.disconnect();
     this.socket = null;
     this.listenersInitialized = false;
-    console.log('🔌 Socket manually disconnected');
   }
 
   isConnected() {

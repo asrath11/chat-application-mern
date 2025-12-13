@@ -5,7 +5,6 @@ import Message from '@/models/message.model';
 
 export const registerChatHandlers = (io: Server, socket: AuthenticatedSocket) => {
   socket.on('chat:join', async ({ chatId }: { chatId: string }) => {
-    console.log(`User ${socket.userId} joined ${chatId}`);
     socket.join(chatId);
 
     // Mark all undelivered messages as delivered when user joins

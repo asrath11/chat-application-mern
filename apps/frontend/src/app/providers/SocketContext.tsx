@@ -62,8 +62,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     if (!socket) return;
 
     // New message receive handler
-    const handleNewMessage = (data: MessageReceivePayload) => {
-      console.log('📨 message:receive', data);
+    const handleNewMessage = () => {
       // Invalidate chat list to update unread counts
       queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
