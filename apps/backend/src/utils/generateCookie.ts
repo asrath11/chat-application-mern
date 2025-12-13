@@ -6,11 +6,14 @@ export const generateCookie = (
   cookieName: string,
   maxAge: number
 ) => {
-  res.cookie(cookieName, token, {
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const cookieOptions: any = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge,
     path: '/',
-  });
+  };
+  res.cookie(cookieName, token, cookieOptions);
 };
