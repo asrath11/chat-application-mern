@@ -14,6 +14,7 @@ import { MessageList } from './ChatWindow/MessageList';
 import { MessageInput } from './ChatWindow/MessageInput';
 import { useChat, useMessages } from '@/features/hooks';
 import { useChatContext } from '@/features/chat/context';
+import { Loading } from '@/components/shared/Loading';
 
 interface ChatWindowProps {
   className: string;
@@ -34,7 +35,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
   const { data: chat, isLoading: chatLoading } = useChat(activeChatId || '');
 
   // Fetch messages
-  const { data: messages = [], refetch: refetchMessages } = useMessages(activeChatId || '');
+  const { data: messages = [], refetch: refetchMessages } = useMessages(
+    activeChatId || ''
+  );
 
   // Derived values
   const isOnline = onlineUsers.includes(chat?.userId || '');
@@ -64,17 +67,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
 
     const handleChatRead = (data: { chatId: string; userId: string }) => {
       if (data.chatId === activeChatId && data.userId !== user?.id) {
-        queryClient.setQueryData(['messages', activeChatId], (old: Message[] = []) =>
-          old.map((msg) => {
-            const senderId =
-              typeof msg.sender === 'object' && msg.sender?._id
-                ? msg.sender._id
-                : msg.sender;
+        queryClient.setQueryData(
+          ['messages', activeChatId],
+          (old: Message[] = []) =>
+            old.map((msg) => {
+              const senderId =
+                typeof msg.sender === 'object' && msg.sender?._id
+                  ? msg.sender._id
+                  : msg.sender;
 
-            return senderId === user?.id && msg.status !== 'read'
-              ? { ...msg, status: 'read' }
-              : msg;
-          })
+              return senderId === user?.id && msg.status !== 'read'
+                ? { ...msg, status: 'read' }
+                : msg;
+            })
         );
         refetchMessages();
       }
@@ -130,19 +135,27 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
 
     if (!socket || !user?.id || !activeChatId) return;
 
-    socket.emit('typing:start', { chatId: activeChatId, userId: user.id, isTyping: true });
+    socket.emit('typing:start', {
+      chatId: activeChatId,
+      userId: user.id,
+      isTyping: true,
+    });
 
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit('typing:stop', { chatId: activeChatId, userId: user.id, isTyping: false });
+      socket.emit('typing:stop', {
+        chatId: activeChatId,
+        userId: user.id,
+        isTyping: false,
+      });
     }, 2000);
   };
 
   if (chatLoading) {
     return (
-      <div className='flex items-center justify-center h-full'>
-        <p>Loading chat...</p>
+      <div className='flex items-center justify-center h-full bg-background'>
+        <Loading size='lg' text='Loading chat...' />
       </div>
     );
   }

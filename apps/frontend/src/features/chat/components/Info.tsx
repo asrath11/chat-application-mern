@@ -4,11 +4,11 @@ import { useChatContext } from '@/features/chat/context';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/shared/Avatar';
-import { Skeleton } from '@/components/ui/skeleton';
 import type { User } from '@chat-app/shared-types';
 import { useAuth } from '@/app/providers/AuthContext';
 import { AddParticipantsModal } from './AddParticipantsModal';
 import { DeleteParticipantsModal } from './DeleteParticipantsModal';
+import { ChatInfoSkeleton } from '@/components/shared/LoadingSkeletons';
 
 interface InfoProps {
   className?: string;
@@ -20,7 +20,7 @@ export default function ChatInfo({ className }: InfoProps) {
   const { user } = useAuth();
   const isCurrentUserAdmin = user?.id == chat?.groupAdmin;
 
-  if (isLoading) return <LoadingInfo className={className} />;
+  if (isLoading) return <ChatInfoSkeleton className={className} />;
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
@@ -126,24 +126,6 @@ export default function ChatInfo({ className }: InfoProps) {
             </div>
           )}
         </div>
-      </div>
-    </div>
-  );
-}
-
-/* Loading Skeleton */
-function LoadingInfo({ className }: { className?: string }) {
-  return (
-    <div className={`flex flex-col h-full ${className}`}>
-      <div className='flex items-center justify-between p-5 border-b'>
-        <Skeleton className='h-6 w-24' />
-        <Skeleton className='h-8 w-8 rounded-md' />
-      </div>
-
-      <div className='flex flex-col items-center p-6 space-y-6'>
-        <Skeleton className='h-24 w-24 rounded-full' />
-        <Skeleton className='h-6 w-32' />
-        <Skeleton className='h-4 w-48' />
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
 
 import {
   Form,
@@ -15,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/shared/LoadingButton';
 import {
   Card,
   CardContent,
@@ -159,16 +158,14 @@ export default function SignUp() {
                   )}
                 />
 
-                <Button type='submit' className='w-full' disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Creating account...
-                    </>
-                  ) : (
-                    'Register'
-                  )}
-                </Button>
+                <LoadingButton
+                  type='submit'
+                  className='w-full'
+                  loading={isLoading}
+                  loadingText='Creating account...'
+                >
+                  Register
+                </LoadingButton>
               </div>
             </form>
           </Form>

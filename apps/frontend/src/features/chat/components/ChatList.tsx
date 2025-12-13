@@ -7,6 +7,7 @@ import { ChatListItem } from '@/features/chat/components/ChatList/ChatListItem';
 import { ChatListFooter } from '@/features/chat/components/ChatList/ChatListFooter';
 import { useChats } from '@/features/hooks';
 import { useChatContext } from '@/features/chat/context';
+import { ChatListSkeleton } from '@/components/shared/LoadingSkeletons';
 
 const ChatList: React.FC = () => {
   const { user, logout } = useAuth();
@@ -21,16 +22,20 @@ const ChatList: React.FC = () => {
 
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
-          <div className='flex items-center justify-center h-full'>
-            Loading chats...
-          </div>
+          <ChatListSkeleton />
         ) : error ? (
-          <div className='flex items-center justify-center h-full'>
-            Error loading chats
+          <div className='flex items-center justify-center h-full text-muted-foreground'>
+            <div className='text-center'>
+              <p className='text-sm'>Error loading chats</p>
+              <p className='text-xs mt-1'>Please try refreshing the page</p>
+            </div>
           </div>
         ) : chats?.length === 0 ? (
-          <div className='flex items-center justify-center h-full'>
-            No chats available
+          <div className='flex items-center justify-center h-full text-muted-foreground'>
+            <div className='text-center'>
+              <p className='text-sm'>No chats available</p>
+              <p className='text-xs mt-1'>Start a conversation to see it here</p>
+            </div>
           </div>
         ) : (
           chats?.map((chat) => {
