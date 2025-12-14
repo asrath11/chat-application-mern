@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '@/app/providers/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '@/app/providers/SocketContext';
@@ -15,10 +15,21 @@ const ChatList: React.FC = () => {
   const navigate = useNavigate();
   const { data: chats, isLoading, error } = useChats();
   const { activeChatId } = useChatContext();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredChats = useMemo(() => {
+    if (!chats || !searchQuery.trim()) return chats;
+
+    const query = searchQuery.toLowerCase();
+    return chats.filter((chat) => {
+      const chatName = chat.name?.toLowerCase() || '';
+      return chatName.includes(query);
+    });
+  }, [chats, searchQuery]);
 
   return (
     <div className='flex flex-col h-screen w-full bg-card'>
-      <ChatListHeader />
+      <ChatListHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
@@ -30,15 +41,21 @@ const ChatList: React.FC = () => {
               <p className='text-xs mt-1'>Please try refreshing the page</p>
             </div>
           </div>
-        ) : chats?.length === 0 ? (
+        ) : filteredChats?.length === 0 ? (
           <div className='flex items-center justify-center h-full text-muted-foreground'>
             <div className='text-center'>
-              <p className='text-sm'>No chats available</p>
-              <p className='text-xs mt-1'>Start a conversation to see it here</p>
+              <p className='text-sm'>
+                {searchQuery ? 'No chats found' : 'No chats available'}
+              </p>
+              <p className='text-xs mt-1'>
+                {searchQuery
+                  ? 'Try a different search term'
+                  : 'Start a conversation to see it here'}
+              </p>
             </div>
           </div>
         ) : (
-          chats?.map((chat) => {
+          filteredChats?.map((chat) => {
             const isOnline = chat.userId
               ? onlineUsers.includes(chat.userId)
               : chat.isOnline;
