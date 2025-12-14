@@ -52,6 +52,7 @@ export const getAllMessages = asyncHandler(
       return {
         ...messageObj,
         sender: sender._id,
+        timestamp: messageObj.createdAt,
       };
     });
 

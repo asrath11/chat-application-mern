@@ -44,8 +44,7 @@ export const registerMessageHandlers = (
         chat: message.chat.toString(),
         content: message.content,
         status: message.status,
-        createdAt: message.createdAt.toISOString(),
-        updatedAt: message.updatedAt.toISOString(),
+        timestamp: message.createdAt.toISOString(),
       },
       chatId: data.chatId,
     });

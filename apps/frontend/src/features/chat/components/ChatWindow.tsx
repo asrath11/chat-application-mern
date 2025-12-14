@@ -60,29 +60,39 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
 
     const handleNewMessage = (data: MessageReceivePayload) => {
       if (data.chatId === activeChatId) {
-        refetchMessages();
+        // Update cache directly instead of refetching
+        queryClient.setQueryData(
+          ['messages', activeChatId],
+          (old: Message[] = []) => {
+            // Remove temp message if exists and add real message
+            const filtered = old.filter((msg) => !msg._id?.startsWith('temp-'));
+            return [...filtered, data.message];
+          }
+        );
         socket.emit('chat:read', { chatId: activeChatId });
       }
     };
 
     const handleChatRead = (data: { chatId: string; userId: string }) => {
-      if (data.chatId === activeChatId && data.userId !== user?.id) {
-        queryClient.setQueryData(
-          ['messages', activeChatId],
-          (old: Message[] = []) =>
-            old.map((msg) => {
-              const senderId =
-                typeof msg.sender === 'object' && msg.sender?._id
-                  ? msg.sender._id
-                  : msg.sender;
+      const isCurrentChat = data.chatId === activeChatId;
+      const isOtherUser = data.userId !== user?.id;
 
-              return senderId === user?.id && msg.status !== 'read'
-                ? { ...msg, status: 'read' }
-                : msg;
-            })
-        );
-        refetchMessages();
-      }
+      if (!isCurrentChat || !isOtherUser) return;
+
+      queryClient.setQueryData(
+        ['messages', activeChatId],
+        (old: Message[] = []) =>
+          old.map((msg) => {
+            const senderId =
+              typeof msg.sender === 'object' ? msg.sender?._id : msg.sender;
+            const isMyMessage = senderId === user?.id;
+            const isUnread = msg.status !== 'read';
+
+            return isMyMessage && isUnread ? { ...msg, status: 'read' } : msg;
+          })
+      );
+
+      refetchMessages();
     };
 
     socket.on('message:receive', handleNewMessage);
@@ -117,12 +127,31 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
   // Send message
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || !activeChatId) return;
+    if (!message.trim() || !activeChatId || !user?.id) return;
 
     const payload: MessageSendPayload = {
       content: message,
       chatId: activeChatId,
     };
+
+    // Optimistic update - add message immediately
+    const tempMessage: Message = {
+      _id: `temp-${Date.now()}`,
+      content: message,
+      chat: activeChatId,
+      sender: {
+        _id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+      },
+      status: 'sent',
+      timestamp: new Date().toISOString(),
+    };
+
+    queryClient.setQueryData(
+      ['messages', activeChatId],
+      (old: Message[] = []) => [...old, tempMessage]
+    );
 
     socket?.emit('message:send', payload);
     setMessage('');
