@@ -1,135 +1,362 @@
-# Turborepo starter
+# 💬 Real-Time Chat Application
 
-This Turborepo starter is maintained by the Turborepo core team.
+A modern, full-stack real-time chat application built with cutting-edge technologies. Features instant messaging, user authentication, and a scalable monorepo architecture.
 
-## Using this example
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-black?style=flat&logo=socket.io&badgeColor=010101)
 
-Run the following command:
+## ✨ Features
 
-```sh
-npx create-turbo@latest
-```
+### Core Functionality
 
-## What's inside?
+- 🚀 **Real-time messaging** with Socket.IO for instant communication
+- 🔐 **Secure authentication** using JWT tokens with refresh token support
+- 👥 **Group chat support** with participant management
+- 💬 **One-on-one messaging** for private conversations
+- 📝 **Message history** with persistent storage
+- 🟢 **Presence indicators** showing online/offline/last seen status
+- ⌨️ **Typing indicators** for enhanced user experience
+- ✓ **Read receipts** to track message delivery status
+- 🔍 **User search** for finding and connecting with others
 
-This Turborepo includes the following packages/apps:
+### Technical Highlights
 
-### Apps and Packages
+- 📦 **Monorepo architecture** with Turborepo for efficient builds
+- 🎨 **Modern UI** with TailwindCSS 4 and Radix UI components
+- 🔄 **Type-safe** with shared TypeScript types across frontend and backend
+- 🛡️ **Security-first** with Helmet.js and bcrypt password hashing
+- ✅ **Validation** using Zod schemas on both client and server
+- 📊 **Efficient data fetching** with React Query (TanStack Query)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 🛠️ Tech Stack
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+<table>
+<tr>
+<td valign="top" width="50%">
 
-### Utilities
+### Frontend
 
-This Turborepo has some additional tools already setup for you:
+- **Framework:** React 19 with TypeScript
+- **Build Tool:** Vite
+- **Styling:** TailwindCSS 4
+- **Routing:** React Router v7
+- **State Management:** React Query (TanStack Query)
+- **Forms:** React Hook Form + Zod
+- **UI Components:** Radix UI
+- **Real-time:** Socket.IO Client
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+</td>
+<td valign="top" width="50%">
 
-### Build
+### Backend
 
-To build all apps and packages, run the following command:
+- **Runtime:** Node.js 22+
+- **Framework:** Express 5
+- **Language:** TypeScript
+- **Database:** MongoDB with Mongoose ODM
+- **Real-time:** Socket.IO
+- **Authentication:** JWT (jsonwebtoken)
+- **Security:** Helmet.js, bcrypt
+- **Validation:** Zod
 
-```
-cd my-turborepo
+</td>
+</tr>
+</table>
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+### DevOps & Tooling
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+- **Monorepo:** Turborepo with pnpm workspaces
+- **Package Manager:** pnpm 9.0.0
+- **Deployment:** Vercel-ready configuration
+- **Code Quality:** ESLint, Prettier, TypeScript strict mode
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## 📁 Project Structure
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+chat-application/
+├── apps/
+│   ├── backend/                 # Express API server
+│   │   ├── src/
+│   │   │   ├── config/         # Configuration files
+│   │   │   ├── controllers/    # Route controllers
+│   │   │   ├── middlewares/    # Custom middleware
+│   │   │   ├── models/         # Mongoose models
+│   │   │   ├── routes/         # API routes
+│   │   │   ├── socket/         # Socket.IO handlers
+│   │   │   ├── utils/          # Helper functions
+│   │   │   └── index.ts        # Entry point
+│   │   ├── .env.example
+│   │   └── package.json
+│   │
+│   └── frontend/               # React application
+│       ├── src/
+│       │   ├── app/           # App configuration
+│       │   ├── components/    # Reusable components
+│       │   ├── features/      # Feature modules
+│       │   ├── hooks/         # Custom React hooks
+│       │   ├── services/      # API services
+│       │   └── main.tsx       # Entry point
+│       └── package.json
+│
+├── packages/
+│   └── shared-types/          # Shared TypeScript types
+│       ├── src/
+│       └── package.json
+│
+├── turbo.json                 # Turborepo configuration
+├── pnpm-workspace.yaml        # pnpm workspace config
+└── package.json               # Root package.json
 ```
 
-### Remote Caching
+## 🚀 Getting Started
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+### Prerequisites
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+Ensure you have the following installed:
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+- **Node.js** >= 22.12.0 ([Download](https://nodejs.org/))
+- **pnpm** 9.0.0+ (`npm install -g pnpm`)
+- **MongoDB** instance (local or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd chat-application
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Configure environment variables**
+
+   Create a `.env` file in the `apps/backend/` directory:
+
+   ```bash
+   cp apps/backend/.env.example apps/backend/.env
+   ```
+
+   Update with your configuration:
+
+   ```env
+   # Server Configuration
+   PORT=3000
+   NODE_ENV=development
+
+   # Database
+   MONGO_URI=mongodb://localhost:27017/chat-app
+   # Or use MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/chat-app
+
+   # JWT Secrets (use strong, random strings in production)
+   JWT_SECRET=your_super_secret_jwt_key_here
+   JWT_REFRESH_SECRET=your_super_secret_refresh_key_here
+   JWT_EXPIRES_IN=15d
+   JWT_REFRESH_EXPIRES_IN=30d
+   ```
+
+4. **Start the development servers**
+
+   ```bash
+   # Start both frontend and backend
+   pnpm dev
+
+   # Or start individually
+   pnpm dev --filter=backend
+   pnpm dev --filter=frontend
+   ```
+
+5. **Access the application**
+   - Frontend: [http://localhost:5173](http://localhost:5173)
+   - Backend API: [http://localhost:3000](http://localhost:3000)
+   - API Health Check: [http://localhost:3000/api/health](http://localhost:3000/api/health)
+
+## 📜 Available Scripts
+
+### Root Level Commands
+
+```bash
+pnpm dev          # Start all apps in development mode
+pnpm build        # Build all apps and packages
+pnpm lint         # Lint all apps
+pnpm format       # Format code with Prettier
+pnpm type-check   # Type check all TypeScript files
+pnpm clean        # Clean all build artifacts
+```
+
+### Backend Specific
+
+```bash
+cd apps/backend
+pnpm dev          # Start with hot reload (nodemon)
+pnpm build        # Compile TypeScript to JavaScript
+pnpm start        # Run production build
+pnpm lint         # Lint backend code
+```
+
+### Frontend Specific
+
+```bash
+cd apps/frontend
+pnpm dev          # Start Vite dev server
+pnpm build        # Build for production
+pnpm preview      # Preview production build locally
+pnpm lint         # Lint frontend code
+```
+
+## 🚢 Deployment
+
+### Deploy to Vercel
+
+This project includes Vercel configuration for seamless deployment.
+
+1. **Install Vercel CLI**
+
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Deploy**
+
+   ```bash
+   vercel
+   ```
+
+3. **Configure Environment Variables**
+   - Go to your Vercel dashboard
+   - Navigate to Project Settings → Environment Variables
+   - Add all variables from your `.env` file
+
+### Other Deployment Options
+
+**Backend:**
+
+- Deploy to Railway, Render, or any Node.js hosting platform
+- Ensure MongoDB connection string is configured
+- Set all environment variables
+
+**Frontend:**
+
+- Can be deployed separately to Vercel, Netlify, or Cloudflare Pages
+- Update API endpoint in frontend configuration
+
+## 🗺️ Roadmap
+
+### Completed ✅
+
+- [x] User registration and login
+- [x] JWT authentication with refresh tokens
+- [x] Real-time one-on-one messaging
+- [x] Group chat functionality
+- [x] Message history and persistence
+- [x] User presence indicators (online/offline/last seen)
+- [x] Typing indicators
+- [x] Message read receipts
+- [x] Group participant management (add/remove)
+- [x] User search and selection
+
+### In Progress 🚧
+
+- [ ] File sharing (images, documents)
+- [ ] Message reactions (emoji)
+- [ ] User profiles (view/edit)
+- [ ] Message editing
+- [ ] Message deletion
+- [ ] Global search (messages, users, groups)
+
+### Planned 📋
+
+- [ ] Voice messages
+- [ ] Video calls integration
+- [ ] Push notifications
+- [ ] Message forwarding
+- [ ] Dark mode theme
+- [ ] Multi-language support (i18n)
+- [ ] Message encryption
+- [ ] Admin dashboard
+
+## 🏗️ Architecture
+
+### Authentication Flow
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+User Login → JWT Token Generated → Token Stored in Client
+           ↓
+Authenticated Requests → JWT Verified → Access Granted
+           ↓
+Token Expires → Refresh Token → New JWT Issued
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+### Real-time Communication
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+Client A → Socket.IO → Server → Socket.IO → Client B
+                         ↓
+                    MongoDB (Persist)
 ```
 
-## Useful Links
+## 🤝 Contributing
 
-Learn more about the power of Turborepo:
+Contributions are welcome! Please follow these steps:
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add some amazing feature'
+   ```
+4. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open a Pull Request**
+
+### Code Style Guidelines
+
+- Follow the existing code style
+- Use TypeScript for type safety
+- Write meaningful commit messages
+- Add comments for complex logic
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the **ISC License**.
+
+## 🐛 Issues & Support
+
+Encountered a bug or have a feature request?
+
+- **Report Issues:** [Open an issue](../../issues)
+- **Discussions:** [Join the discussion](../../discussions)
+
+## 👥 Authors
+
+- Your Name - Asrath
+
+## 🙏 Acknowledgments
+
+- Socket.IO team for real-time communication
+- Vercel for hosting solutions
+- MongoDB for database services
+- All open-source contributors
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#-real-time-chat-application)**
+
+Made with ❤️ by Asrath
+
+</div>
