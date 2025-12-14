@@ -23,7 +23,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   }, [messages]);
 
   return (
-    <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+    <div className='flex-1 overflow-y-auto p-4 space-y-4 bg-background'>
       {messages.length === 0 ? (
         <p className='text-center text-muted-foreground'>No messages yet</p>
       ) : (

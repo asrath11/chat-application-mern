@@ -14,9 +14,9 @@ export const ChatListHeader: React.FC<ChatListHeaderProps> = ({
   onSearchChange,
 }) => {
   return (
-    <div className='p-4 border-b'>
+    <div className='p-4 border-b border-border bg-card'>
       <div className='flex items-center justify-between mb-4'>
-        <h1 className='text-2xl font-bold'>Chats</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Chats</h1>
         <div className='space-x-2'>
           <ChatInvite />
           <CreateGroupChat />
@@ -24,7 +24,7 @@ export const ChatListHeader: React.FC<ChatListHeaderProps> = ({
       </div>
 
       <div className='relative'>
-        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5' />
+        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground' />
         <Input
           type='text'
           placeholder='Search conversations...'

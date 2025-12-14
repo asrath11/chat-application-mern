@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   // Fetch all users
   const { data: users = [] } = useUsers();
-  const { toggleInfoPanel } = useChatContext()
+  const { toggleInfoPanel } = useChatContext();
 
   // Memoize participant names to avoid recalculating on every render
   const participantNames = useMemo(() => {
@@ -32,25 +32,25 @@ export const Header: React.FC<HeaderProps> = ({
   }, [users, participants]);
 
   return (
-    <div className='flex items-center justify-between p-4 bg-card border-b'>
+    <div className='flex items-center justify-between p-4 bg-card border-b border-border'>
       <div className='flex items-center gap-3'>
         <div className='relative'>
           <Avatar name={name} onClick={toggleInfoPanel} />
 
           {isOnline && (
             <div
-              className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-card rounded-full'
+              className='absolute bottom-0 right-0 w-3 h-3 bg-chart-1 border-2 border-card rounded-full'
               aria-label='Online'
             />
           )}
         </div>
 
         <div className='flex flex-col'>
-          <h2 className='font-semibold text-gray-900 dark:text-white'>{name}</h2>
-          <p className='text-xs text-gray-600 dark:text-gray-400'>{statusText}</p>
+          <h2 className='font-semibold text-foreground'>{name}</h2>
+          <p className='text-xs text-muted-foreground'>{statusText}</p>
           {isGroupChat && participantNames.length > 0 && (
             <p
-              className='text-xs text-gray-600 dark:text-gray-400 truncate max-w-[200px]'
+              className='text-xs text-muted-foreground truncate max-w-[200px]'
               title={participantNames.join(', ')}
             >
               {participantNames.join(', ')}

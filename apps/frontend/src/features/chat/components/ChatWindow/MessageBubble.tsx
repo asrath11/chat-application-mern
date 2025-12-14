@@ -17,28 +17,29 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const { data: users } = useUsers();
   const user = users?.find((user) => user.id === message.sender);
   return (
-    <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex mb-2 ${isMe ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+        className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm ${
           isMe
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-secondary text-secondary-foreground'
+            ? 'bg-primary text-primary-foreground rounded-br-md'
+            : 'bg-secondary text-secondary-foreground rounded-bl-md'
         }`}
       >
-        <div className='text-sm wrap-break-word'>
-          {isGroupChat && (
-            <div style={{ color: generateRandomColor(user?.userName || '') }}>
-              {user?.userName}
-            </div>
-          )}
+        {isGroupChat && !isMe && (
+          <div
+            className='text-xs font-semibold mb-1'
+            style={{ color: generateRandomColor(user?.userName || '') }}
+          >
+            {user?.userName}
+          </div>
+        )}
 
-          <div>{message.content}</div>
-        </div>
+        <div className='text-sm whitespace-pre-wrap'>{message.content}</div>
 
-        <div className='flex items-center justify-end gap-1 mt-1'>
+        <div className='flex items-center justify-end gap-1.5 mt-1'>
           <span
-            className={`text-xs ${
-              isMe ? 'text-muted-foreground' : 'text-primary'
+            className={`text-[11px] ${
+              isMe ? 'text-primary-foreground/60' : 'text-muted-foreground/70'
             }`}
           >
             {message.timestamp
@@ -50,13 +51,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           </span>
 
           {isMe && (
-            <span className='text-xs'>
+            <span className='text-xs leading-none'>
               {message.status === 'read' ? (
-                <span className='text-blue-800'>✓✓</span>
+                <span className='text-blue-400'>✓✓</span>
               ) : message.status === 'delivered' ? (
-                <span>✓✓</span>
+                <span className='text-primary-foreground/60'>✓✓</span>
               ) : (
-                <span>✓</span>
+                <span className='text-primary-foreground/50'>✓</span>
               )}
             </span>
           )}

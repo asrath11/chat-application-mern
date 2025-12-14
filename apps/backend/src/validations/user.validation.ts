@@ -15,3 +15,20 @@ export const getUserSchema = z.object({
 });
 
 export type GetUserInput = z.infer<typeof getUserSchema>;
+
+export const updateProfileSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required').trim(),
+    avatar: z.string().url('Invalid avatar URL').optional().or(z.literal('')),
+  }),
+});
+
+export const updatePasswordSchema = z.object({
+  body: z.object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z.string().min(6, 'New password must be at least 6 characters'),
+  }),
+});
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>;

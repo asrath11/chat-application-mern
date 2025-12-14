@@ -14,8 +14,8 @@ const ChatDashboardContent: React.FC = () => {
   }, [chatId, setActiveChatId]);
 
   return (
-    <div className='flex h-screen bg-card'>
-      <div className='md:w-70 border-r'>
+    <div className='flex h-screen bg-background'>
+      <div className='md:w-70 border-r border-border bg-card'>
         <ChatList />
       </div>
       <div className='flex w-full'>

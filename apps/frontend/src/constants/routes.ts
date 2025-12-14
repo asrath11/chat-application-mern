@@ -3,6 +3,7 @@ export const ROUTES = {
   CHAT: '/chat/:chatId',
   SIGN_IN: '/signin',
   SIGN_UP: '/signup',
+  PROFILE: '/profile',
 } as const;
 
 export const API_ROUTES = {
