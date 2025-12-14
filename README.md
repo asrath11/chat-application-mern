@@ -126,8 +126,8 @@ Ensure you have the following installed:
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
-   cd chat-application
+   git clone https://github.com/asrath11/chat-application-mern
+   cd chat-application-mern
    ```
 
 2. **Install dependencies**
