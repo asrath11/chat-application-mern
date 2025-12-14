@@ -278,7 +278,6 @@ This project includes Vercel configuration for seamless deployment.
 - [ ] Push notifications
 - [ ] Message forwarding
 - [ ] Dark mode theme
-- [ ] Multi-language support (i18n)
 - [ ] Message encryption
 - [ ] Admin dashboard
 
@@ -342,7 +341,7 @@ Encountered a bug or have a feature request?
 
 ## 👥 Authors
 
-- Your Name - Asrath
+- Asrath
 
 ## 🙏 Acknowledgments
 
