@@ -18,8 +18,8 @@ export type GetUserInput = z.infer<typeof getUserSchema>;
 
 export const updateProfileSchema = z.object({
   body: z.object({
-    name: z.string().min(1, 'Name is required').trim(),
-    avatar: z.string().url('Invalid avatar URL').optional().or(z.literal('')),
+    userName: z.string().min(1, 'Name is required').trim(),
+    avatar: z.string().optional().or(z.literal('')),
   }),
 });
 

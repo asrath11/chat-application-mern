@@ -1,12 +1,39 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/ui/password-input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Key, Shield, X, Loader2, Lock, Check } from 'lucide-react';
 import { PasswordRequirements } from './PasswordRequirements';
 import { updatePassword } from '../../services/user.service';
+
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(
+        /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Password must contain uppercase, lowercase, and numbers'
+      ),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 interface PasswordChangeFormProps {
   lastUpdated: string | Date;
@@ -14,10 +41,14 @@ interface PasswordChangeFormProps {
 
 export function PasswordChangeForm({ lastUpdated }: PasswordChangeFormProps) {
   const [isChanging, setIsChanging] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+
+  const form = useForm<z.infer<typeof passwordFormSchema>>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
   });
 
   const passwordMutation = useMutation({
@@ -26,11 +57,7 @@ export function PasswordChangeForm({ lastUpdated }: PasswordChangeFormProps) {
       toast.success('Password updated successfully', {
         icon: <Check className='h-4 w-4' />,
       });
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
+      form.reset();
       setIsChanging(false);
     },
     onError: (error: any) => {
@@ -38,41 +65,15 @@ export function PasswordChangeForm({ lastUpdated }: PasswordChangeFormProps) {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!passwordData.currentPassword || !passwordData.newPassword) {
-      toast.error('All password fields are required');
-      return;
-    }
-
-    if (passwordData.newPassword.length < 8) {
-      toast.error('New password must be at least 8 characters');
-      return;
-    }
-
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(passwordData.newPassword)) {
-      toast.error('Password must contain uppercase, lowercase, and numbers');
-      return;
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
+  const handleSubmit = (values: z.infer<typeof passwordFormSchema>) => {
     passwordMutation.mutate({
-      currentPassword: passwordData.currentPassword,
-      newPassword: passwordData.newPassword,
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
     });
   };
 
   const handleCancel = () => {
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
+    form.reset();
     setIsChanging(false);
   };
   return (
@@ -95,91 +96,96 @@ export function PasswordChangeForm({ lastUpdated }: PasswordChangeFormProps) {
       </div>
 
       {isChanging ? (
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-            <div className='space-y-2'>
-              <Label
-                htmlFor='currentPassword'
-                className='text-muted-foreground flex items-center space-x-2'
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+              <FormField
+                control={form.control}
+                name='currentPassword'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-muted-foreground flex items-center space-x-2'>
+                      <Key className='h-4 w-4' />
+                      <span>Current Password</span>
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder='Enter current password'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='newPassword'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-muted-foreground'>
+                      New Password
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder='Enter new password'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='confirmPassword'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-muted-foreground'>
+                      Confirm Password
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder='Confirm new password'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <PasswordRequirements />
+
+            <div className='flex justify-end space-x-3 pt-2'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleCancel}
+                disabled={passwordMutation.isPending}
               >
-                <Key className='h-4 w-4' />
-                <span>Current Password</span>
-              </Label>
-              <PasswordInput
-                id='currentPassword'
-                value={passwordData.currentPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    currentPassword: e.target.value,
-                  })
-                }
-                placeholder='Enter current password'
-              />
+                <X className='h-4 w-4 mr-2' />
+                Cancel
+              </Button>
+              <Button type='submit' disabled={passwordMutation.isPending}>
+                {passwordMutation.isPending ? (
+                  <>
+                    <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Shield className='h-4 w-4 mr-2' />
+                    Update Password
+                  </>
+                )}
+              </Button>
             </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='newPassword' className='text-muted-foreground'>
-                New Password
-              </Label>
-              <PasswordInput
-                id='newPassword'
-                value={passwordData.newPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    newPassword: e.target.value,
-                  })
-                }
-                placeholder='Enter new password'
-              />
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='confirmPassword' className='text-muted-foreground'>
-                Confirm Password
-              </Label>
-              <PasswordInput
-                id='confirmPassword'
-                value={passwordData.confirmPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    confirmPassword: e.target.value,
-                  })
-                }
-                placeholder='Confirm new password'
-              />
-            </div>
-          </div>
-
-          <PasswordRequirements />
-
-          <div className='flex justify-end space-x-3 pt-2'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={handleCancel}
-              disabled={passwordMutation.isPending}
-            >
-              <X className='h-4 w-4 mr-2' />
-              Cancel
-            </Button>
-            <Button type='submit' disabled={passwordMutation.isPending}>
-              {passwordMutation.isPending ? (
-                <>
-                  <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <Shield className='h-4 w-4 mr-2' />
-                  Update Password
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       ) : (
         <div className='p-6 rounded-lg bg-muted'>
           <div className='flex items-center space-x-4'>

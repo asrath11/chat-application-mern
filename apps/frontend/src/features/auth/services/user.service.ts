@@ -13,7 +13,7 @@ export const getAllUsers = async () => {
 };
 
 export interface UpdateProfileData {
-  name: string;
+  userName: string;
   avatar?: string;
 }
 
@@ -22,12 +22,19 @@ export interface UpdatePasswordData {
   newPassword: string;
 }
 
-export const updateProfile = async (data: UpdateProfileData): Promise<AuthResponse> => {
+export const updateProfile = async (
+  data: UpdateProfileData
+): Promise<AuthResponse> => {
   const response = await axiosInstance.put<AuthResponse>('/users/profile', data);
   return response.data;
 };
 
-export const updatePassword = async (data: UpdatePasswordData): Promise<{ message: string }> => {
-  const response = await axiosInstance.put<{ message: string }>('/users/password', data);
+export const updatePassword = async (
+  data: UpdatePasswordData
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.put<{ message: string }>(
+    '/users/password',
+    data
+  );
   return response.data;
 };

@@ -28,17 +28,27 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  const { name, avatar } = req.body;
+  const { userName, avatar } = req.body;
 
-  if (!name || name.trim() === '') {
-    return res.status(400).json({ message: 'Name is required' });
+
+  if (!userName || userName.trim() === '') {
+    return res.status(400).json({ message: 'User name is required' });
+  }
+
+  const isExist = await User.findOne({
+    userName: userName.trim().toLowerCase(),
+    _id: { $ne: userId }
+  });
+
+  if (isExist) {
+    return res.status(400).json({ message: 'User name already exists' });
   }
 
   const user = await User.findByIdAndUpdate(
     userId,
     {
-      userName: name.trim(),
-      ...(avatar !== undefined && { avatar: avatar.trim() })
+      userName: userName.trim().toLowerCase(),
+      avatar: avatar.trim(),
     },
     { new: true, runValidators: true }
   ).select('-password -refreshToken');
@@ -62,37 +72,43 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
-export const updatePassword = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user?.id;
+export const updatePassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.id;
 
-  if (!userId) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: 'Current password and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ message: 'New password must be at least 6 characters' });
+    }
+
+    const user = await User.findById(userId).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isPasswordValid = await user.comparePassword(currentPassword);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
   }
-
-  const { currentPassword, newPassword } = req.body;
-
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ message: 'Current password and new password are required' });
-  }
-
-  if (newPassword.length < 6) {
-    return res.status(400).json({ message: 'New password must be at least 6 characters' });
-  }
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  const isPasswordValid = await user.comparePassword(currentPassword);
-
-  if (!isPasswordValid) {
-    return res.status(401).json({ message: 'Current password is incorrect' });
-  }
-
-  user.password = newPassword;
-  await user.save();
-
-  res.status(200).json({ message: 'Password updated successfully' });
-});
+);
