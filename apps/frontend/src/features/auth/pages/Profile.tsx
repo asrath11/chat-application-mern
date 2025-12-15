@@ -2,21 +2,18 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import type { User as UserType } from '@chat-app/shared-types';
 import { ProfileHeader } from '../components/profile/ProfileHeader';
 import { ProfileAvatar } from '../components/profile/ProfileAvatar';
 import { ProfileUserInfo } from '../components/profile/ProfileUserInfo';
 import { ProfileForm } from '../components/profile/ProfileForm';
 import { PasswordChangeForm } from '../components/profile/PasswordChangeForm';
 import { AccountInfo } from '../components/profile/AccountInfo';
+import { useAuth } from '@/app/providers/AuthContext';
 
-interface ProfileProps {
-  user: UserType;
-}
-
-export default function Profile({ user }: ProfileProps) {
+export default function Profile() {
   const navigate = useNavigate();
-  const [avatar, setAvatar] = useState(user.avatar || '');
+  const { user } = useAuth();
+  const [avatar, setAvatar] = useState(user?.avatar || '');
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -31,6 +28,10 @@ export default function Profile({ user }: ProfileProps) {
     reader.readAsDataURL(file);
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className='min-h-screen bg-background py-8 px-4'>
       <div className='max-w-3xl mx-auto'>
@@ -42,13 +43,13 @@ export default function Profile({ user }: ProfileProps) {
             <div className='flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8'>
               <ProfileAvatar
                 avatar={avatar}
-                name={user.name}
+                name={user.name || ''}
                 onAvatarUpload={handleAvatarUpload}
               />
               <ProfileUserInfo
-                name={user.name}
-                email={user.email}
-                createdAt={user.createdAt}
+                name={user.name || ''}
+                email={user.email || ''}
+                createdAt={user.createdAt || ''}
               />
             </div>
 
@@ -59,13 +60,13 @@ export default function Profile({ user }: ProfileProps) {
 
           {/* Password Card */}
           <Card className='p-8'>
-            <PasswordChangeForm lastUpdated={user.updatedAt} />
+            <PasswordChangeForm lastUpdated={user.updatedAt || ''} />
           </Card>
 
           <AccountInfo
             userId={user.id}
-            createdAt={user.createdAt}
-            updatedAt={user.updatedAt}
+            createdAt={user.createdAt || ''}
+            updatedAt={user.updatedAt || ''}
           />
         </div>
       </div>
