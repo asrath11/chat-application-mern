@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Protected from './ProtectedRoute';
 import { ROUTES } from '@/constants/routes';
-import { Loading } from '@/components/shared/Loading';
 import { useAuth } from '../providers/AuthContext';
 
 const SignIn = lazy(() => import('@/features/auth/pages/SignIn'));
@@ -20,7 +19,7 @@ export const AppRouter = () => {
   );
 
   return (
-    <Suspense fallback={<Loading size='lg' variant='spinner' />}>
+    <Suspense fallback={null}>
       <Routes>
         <Route path={ROUTES.HOME} element={ProtectedChat} />
         <Route path={ROUTES.CHAT} element={ProtectedChat} />
