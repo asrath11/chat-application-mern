@@ -7,7 +7,7 @@ export default function Protected({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   if (isLoading) {
-    return <LoadingScreen text='Authenticating...' />;
+    return <LoadingScreen />;
   }
 
   if (!user) {

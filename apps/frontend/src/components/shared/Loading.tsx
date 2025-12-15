@@ -117,50 +117,10 @@ export const Loading = ({
   return null;
 };
 
-export const LoadingScreen = ({ text = 'Loading...' }: { text?: string }) => {
+export const LoadingScreen = () => {
   return (
     <div className='flex items-center justify-center min-h-screen bg-background'>
-      <Loading size='xl' text={text} variant='spinner' />
-    </div>
-  );
-};
-
-export const LoadingOverlay = ({
-  isVisible,
-  text = 'Loading...',
-  className,
-}: {
-  isVisible: boolean;
-  text?: string;
-  className?: string;
-}) => {
-  if (!isVisible) return null;
-
-  return (
-    <div
-      className={cn(
-        'absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50',
-        className
-      )}
-    >
-      <Loading size='lg' text={text} variant='spinner' />
-    </div>
-  );
-};
-
-export const InlineLoading = ({
-  text = 'Loading...',
-  className,
-}: {
-  text?: string;
-  className?: string;
-}) => {
-  return (
-    <div
-      className={cn('flex items-center gap-2 text-muted-foreground', className)}
-    >
-      <Loader2 className='w-4 h-4 animate-spin' />
-      <span className='text-sm'>{text}</span>
+      <Loading size='xl' variant='spinner' />
     </div>
   );
 };
