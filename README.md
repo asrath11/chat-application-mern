@@ -266,10 +266,10 @@ This project includes Vercel configuration for seamless deployment.
 
 - [ ] File sharing (images, documents)
 - [ ] Message reactions (emoji)
-- [ ] User profiles (view/edit)
+- [x] User profiles (view/edit)
 - [ ] Message editing
 - [ ] Message deletion
-- [ ] Global search (messages, users, groups)
+- [x] Global search (users, groups)
 
 ### Planned 📋
 
