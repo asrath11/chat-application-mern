@@ -25,6 +25,7 @@ axiosInstance.interceptors.response.use(
         await axiosInstance.post('/auth/refresh');
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        window.location.href = '/'
         return Promise.reject(refreshError);
       }
     }
