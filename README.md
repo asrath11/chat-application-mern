@@ -276,7 +276,7 @@ This project includes Vercel configuration for seamless deployment.
 - [ ] Voice messages
 - [ ] Video calls integration
 - [ ] Push notifications
-- [ ] Message forwarding
+- [x] Message forwarding
 - [ ] Dark mode theme
 - [ ] Message encryption
 - [ ] Admin dashboard

@@ -51,7 +51,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
-    toast.success('Message copied to clipboard');
   };
 
   const handleForward = () => {
@@ -60,7 +59,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   const handleForwardSubmit = async (chatIds: string[]) => {
     if (!socket) {
-      toast.error('Connection error. Please try again.');
+      toast.error('Connection error. Please Reload again.');
       return;
     }
 
