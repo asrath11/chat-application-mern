@@ -65,7 +65,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
           ['messages', activeChatId],
           (old: Message[] = []) => {
             // Remove temp message if exists and add real message
-            const filtered = old.filter((msg) => !msg._id?.startsWith('temp-'));
+            const filtered = old.filter((msg) => !msg.id?.startsWith('temp-'));
             return [...filtered, data.message];
           }
         );
@@ -84,7 +84,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
         (old: Message[] = []) =>
           old.map((msg) => {
             const senderId =
-              typeof msg.sender === 'object' ? msg.sender?._id : msg.sender;
+              typeof msg.sender === 'object' ? msg.sender?.id : msg.sender;
             const isMyMessage = senderId === user?.id;
             const isUnread = msg.status !== 'read';
 
@@ -136,11 +136,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
 
     // Optimistic update - add message immediately
     const tempMessage: Message = {
-      _id: `temp-${Date.now()}`,
+      id: `temp-${Date.now()}`,
       content: message,
       chat: activeChatId,
       sender: {
-        _id: user.id,
+        id: user.id,
         name: user.name,
         avatar: user.avatar,
       },
@@ -186,8 +186,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
   }
 
   const participantIds =
-    chat?.participants?.map((p) => (typeof p === 'string' ? p : p._id || p.id)) ||
-    [];
+    chat?.participants?.map((p) => (typeof p === 'string' ? p : p.id)) || [];
 
   return (
     <div className={`flex flex-col h-screen ${className}`}>
@@ -204,6 +203,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
         messages={messages}
         currentUserId={user?.id}
         isTyping={isTyping}
+        currentChatId={activeChatId || undefined}
       />
 
       <MessageInput

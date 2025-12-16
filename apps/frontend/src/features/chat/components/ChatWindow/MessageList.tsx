@@ -8,6 +8,7 @@ interface MessageListProps {
   currentUserId?: string;
   isTyping: boolean;
   isGroupChat: boolean;
+  currentChatId?: string;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -15,6 +16,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   currentUserId,
   isTyping,
   isGroupChat = false,
+  currentChatId,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -29,18 +31,19 @@ export const MessageList: React.FC<MessageListProps> = ({
       ) : (
         messages.map((msg: Message) => {
           const senderId =
-            typeof msg.sender === 'object' && msg.sender?._id
-              ? msg.sender._id
+            typeof msg.sender === 'object' && msg.sender?.id
+              ? msg.sender.id
               : msg.sender;
 
           const isMe = senderId === currentUserId;
 
           return (
             <MessageBubble
-              key={msg._id}
+              key={msg.id}
               message={msg}
               isMe={isMe}
               isGroupChat={isGroupChat}
+              currentChatId={currentChatId}
             />
           );
         })

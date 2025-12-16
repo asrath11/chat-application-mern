@@ -1,14 +1,16 @@
 import mongoose, { Document, model, Schema } from 'mongoose';
 import { IMessage as ISharedMessage } from '@chat-app/shared-types';
+import { type } from 'os';
 
 export interface IMessage
   extends Document,
-    Omit<ISharedMessage, 'sender' | 'chat'> {
+  Omit<ISharedMessage, 'sender' | 'chat'> {
   sender: mongoose.Types.ObjectId;
   chat: mongoose.Types.ObjectId;
   removedFor: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
+  isForwarded: boolean
 }
 
 const messageSchema = new Schema<IMessage>(
@@ -20,6 +22,9 @@ const messageSchema = new Schema<IMessage>(
       type: String,
       enum: ['sent', 'delivered', 'read'],
       default: 'sent',
+    },
+    isForwarded: {
+      type: Boolean
     },
     removedFor: [
       {

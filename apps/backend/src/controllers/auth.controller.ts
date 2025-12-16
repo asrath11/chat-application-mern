@@ -146,14 +146,14 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         user.refreshToken = undefined;
         await user.save({ validateBeforeSave: false });
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const cookieOptions: any = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    partitioned: process.env.NODE_ENV === 'production',
+    path: '/',
   };
 
   res.clearCookie('accessToken', cookieOptions);

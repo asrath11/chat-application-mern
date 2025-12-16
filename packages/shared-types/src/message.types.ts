@@ -11,14 +11,13 @@ export interface IMessage {
 }
 
 export interface Message {
-  _id?: string;
-  id?: string;
+  id: string;
   content: string;
   chat: string;
   sender?:
   | string
   | {
-    _id: string;
+    id: string;
     name: string;
     avatar?: string;
   };
@@ -26,4 +25,5 @@ export interface Message {
   timestamp: string | Date;
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  isForwarded?: boolean;
 }

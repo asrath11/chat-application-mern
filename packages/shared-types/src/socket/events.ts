@@ -6,21 +6,24 @@ export interface MessageSendPayload {
   chatId: string;
   status?: MessageStatus;
   timestamp?: string;
+  isForwarded?: boolean
 }
 
 export interface MessageReceivePayload {
   message: {
-    _id: string;
+    id: string;
     sender: {
-      _id: string;
+      id: string;
       name: string;
       avatar?: string;
     };
     chat: string;
     content: string;
     status: MessageStatus;
+    timestamp: string;
     createdAt: string;
     updatedAt: string;
+    isForwarded?: boolean;
   };
   chatId: string;
 }

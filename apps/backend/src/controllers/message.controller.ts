@@ -50,9 +50,15 @@ export const getAllMessages = asyncHandler(
       const messageObj = message.toObject();
       const sender = messageObj.sender as unknown as IUser;
       return {
-        ...messageObj,
-        sender: sender._id,
+        id: messageObj._id.toString(),
+        content: messageObj.content,
+        chat: messageObj.chat.toString(),
+        sender: sender._id.toString(),
+        status: messageObj.status,
         timestamp: messageObj.createdAt,
+        createdAt: messageObj.createdAt,
+        updatedAt: messageObj.updatedAt,
+        isForwarded: messageObj.isForwarded || false,
       };
     });
 

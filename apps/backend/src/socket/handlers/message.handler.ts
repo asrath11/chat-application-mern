@@ -18,6 +18,7 @@ export const registerMessageHandlers = (
       content: data.content,
       chat: data.chatId,
       sender: socket.userId,
+      isForwarded: data.isForwarded || false,
       status: 'sent',
     });
 
@@ -35,9 +36,9 @@ export const registerMessageHandlers = (
     // Emit to all users in the chat room with proper structure
     io.to(data.chatId).emit('message:receive', {
       message: {
-        _id: message._id.toString(),
+        id: message._id.toString(),
         sender: {
-          _id: sender._id.toString(),
+          id: sender._id.toString(),
           name: sender.userName,
           avatar: sender.avatar,
         },
@@ -45,6 +46,7 @@ export const registerMessageHandlers = (
         content: message.content,
         status: message.status,
         timestamp: message.createdAt.toISOString(),
+        isForwarded: message.isForwarded,
       },
       chatId: data.chatId,
     });
