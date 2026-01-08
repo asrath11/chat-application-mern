@@ -9,9 +9,10 @@
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": ".",
+
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["*"],
       "@chat-app/shared-types": ["../../packages/shared-types/src"]
     }
   },
