@@ -30,14 +30,13 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
 
   const { userName, avatar } = req.body;
 
-
   if (!userName || userName.trim() === '') {
     return res.status(400).json({ message: 'User name is required' });
   }
 
   const isExist = await User.findOne({
     userName: userName.trim().toLowerCase(),
-    _id: { $ne: userId }
+    _id: { $ne: userId },
   });
 
   if (isExist) {

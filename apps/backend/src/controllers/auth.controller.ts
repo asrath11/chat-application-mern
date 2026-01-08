@@ -146,7 +146,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         user.refreshToken = undefined;
         await user.save({ validateBeforeSave: false });
       }
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const cookieOptions: any = {
