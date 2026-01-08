@@ -18,7 +18,7 @@ export const registerMessageHandlers = (
       content: data.content,
       chat: data.chatId,
       sender: socket.userId,
-      isForwarded: data.isForworded ?? false,
+      isForwarded: data.isForwarded ?? false,
       status: 'sent',
     });
 

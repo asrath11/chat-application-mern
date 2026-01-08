@@ -13,7 +13,7 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
-      "@chat-app/shared-types": ["../../packages/shared-types/src"]
+      "@chat-app/shared-types": ["../../../packages/shared-types/src"]
     }
   },
   "include": ["src"],
