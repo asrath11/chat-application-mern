@@ -53,6 +53,7 @@ httpServer.listen(config.port, () => {
   console.log(`🚀 Server running on http://localhost:${config.port}`);
   console.log(`🔌 Socket.IO server ready`);
   console.log(`📝 Environment: ${config.nodeEnv}`);
+  console.log(`🔗 Client URL: ${config.clientUrl}`);
 });
 
 // Force restart
