@@ -1,6 +1,11 @@
 # 💬 Real-Time Chat Application
 
-A modern, full-stack real-time chat application built with cutting-edge technologies. Features instant messaging, user authentication, and a scalable monorepo architecture.
+A modern, full-stack real-time chat application built with cutting-edge technologies.  
+Features instant messaging, secure authentication, and a scalable monorepo architecture.
+
+🔗 **Live Demo:** https://chat-application-mern-frontend.vercel.app/  
+📦 **Repository:** https://github.com/asrath11/chat-application-mern
+
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
