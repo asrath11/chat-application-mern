@@ -6,12 +6,18 @@ Features instant messaging, secure authentication, and a scalable monorepo archi
 🔗 **Live Demo:** https://chat-application-mern-frontend.vercel.app/  
 📦 **Repository:** https://github.com/asrath11/chat-application-mern
 
+### 🔐 Demo Credentials
+- **Email:** demo@example.com  
+- **Password:** demo123
+
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
 ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-black?style=flat&logo=socket.io&badgeColor=010101)
+
+> ⚠️ Note: The backend may take a few seconds to respond on first load due to cold start.
 
 ## ✨ Features
 
