@@ -1,0 +1,22 @@
+services:
+  backend:
+    container_name: chat-app-backend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
+  frontend:
+    container_name: chat-app-frontend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    depends_on:
+      - backend
